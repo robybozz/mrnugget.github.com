@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[]]></title>
+  <link href="/atom.xml" rel="self"/>
+  <link href="/"/>
+  <updated>2012-05-25T20:36:49+02:00</updated>
+  <id>/</id>
+  <author>
+    <name><![CDATA[]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Well]]></title>
+    <link href="/source/2012/05/25/well.html"/>
+    <updated>2012-05-25T20:28:00+02:00</updated>
+    <id>/source/2012/05/25/well</id>
+    <content type="html"><![CDATA[<h1 id='well_yes_certainly'>Well, yes, certainly</h1>
+
+<p>I guess this is the first post and I&#8217;m playing around with Octopress!</p>]]></content>
+  </entry>
+  
+</feed>
