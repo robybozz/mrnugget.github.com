@@ -1,3 +1,5 @@
+$max-width: 940px !default;
+
 // Here you can easily change your sites's layout.
 // To give it a try, uncomment some of the lines below, make changes, rebuild your blog, and see how it works.
 
@@ -9,19 +11,58 @@
 //$indented-lists: true;
 
 // Padding used for layout margins
-//$pad-min: 18px;
-//$pad-narrow: 25px;
-//$pad-medium: 35px;
-//$pad-wide: 55px;
+$pad-min: 18px;
+$pad-narrow: 25px;
+$pad-medium: 35px;
+$pad-wide: 55px;
 
 // Sidebar widths used in media queries
 //$sidebar-width-medium: 240px;
 //$sidebar-pad-medium: 15px;
 //$sidebar-pad-wide: 20px;
 //$sidebar-width-wide: 300px;
-$max-width: 940px !default;
 body {
   > header {
     text-align: center;
+  }
+  > nav {
+    background: $img-border top left repeat-x;
+    text-align: center;
+  }
+  > footer {
+    background: $img-border top left repeat-x;
+    text-align: center;
+  }
+}
+@mixin collapse-sidebar {
+  float: none;
+  width: auto;
+  clear: left;
+  margin: 0;
+  padding: 0 $pad-medium 1px;
+  background: $sidebar-bg;
+  border-top: 1px solid lighten($sidebar-border, 4);
+  section {
+    &.odd, &.even { float: left; width: 48%; }
+    &.odd { margin-left: 0; }
+    &.even { margin-left: 4%; }
+  }
+  &.thirds section {
+    width: 30%;
+    margin-left: 5%;
+    &.first {
+      margin-left: 0;
+      clear: both;
+    }
+  }
+}
+aside.sidebar {
+  float: none;
+  padding: 0 $pad-min 1px;
+  background: $sidebar-bg;
+  border-top: 1px solid $sidebar-border;
+  @extend .group;
+  > img {
+    margin: 2em;
   }
 }

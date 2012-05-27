@@ -1,4 +1,4 @@
-$max-width: 1200px !default;
+$max-width: 940px !default;
 
 // Padding used for layout margins
 $pad-min: 18px !default;
@@ -26,7 +26,7 @@ $header-padding-bottom: 1.5em !default;
   clear: left;
   margin: 0;
   padding: 0 $pad-medium 1px;
-  background-color: lighten($sidebar-bg, 2);
+  background-color: $sidebar-bg-color;
   border-top: 1px solid lighten($sidebar-border, 4);
   section {
     &.odd, &.even { float: left; width: 48%; }
@@ -97,7 +97,7 @@ body {
 aside.sidebar {
   float: none;
   padding: 0 $pad-min 1px;
-  background-color: lighten($sidebar-bg, 2);
+  // background-color: lighten($sidebar-bg, 2);
   border-top: 1px solid $sidebar-border;
   @extend .group;
 }
