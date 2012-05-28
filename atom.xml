@@ -4,7 +4,7 @@
   <title><![CDATA[Written by Thorsten Ball]]></title>
   <link href="http://mrnugget.github.com/atom.xml" rel="self"/>
   <link href="http://mrnugget.github.com/"/>
-  <updated>2012-05-28T18:35:39+02:00</updated>
+  <updated>2012-05-28T18:37:06+02:00</updated>
   <id>http://mrnugget.github.com/</id>
   <author>
     <name><![CDATA[Thorsten Ball]]></name>
@@ -12,5 +12,14 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Here be dragons]]></title>
+    <link href="http://mrnugget.github.com/blog/2012/05/28/here-be-dragons/"/>
+    <updated>2012-05-28T18:36:00+02:00</updated>
+    <id>http://mrnugget.github.com/blog/2012/05/28/here-be-dragons</id>
+    <content type="html"><![CDATA[<p>&#8230; and there will be.</p>
+]]></content>
+  </entry>
   
 </feed>
