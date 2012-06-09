@@ -251,14 +251,11 @@ user.
 ## Score & Popularity
 
 Until now we ignored the score of our sorted sets. But let's say all our users
-are looking up *Kill Bill* by typing in *Ki Bi* and hitting enter.
-
-Let's also assume there are a lot more users looking up *Kill Bill* than there
-are people interested in *Kindergarten Cop* (as weird as this assumption may
-sound, bear with me here). 
-
-Remember when we associated the movies with the prefixes? We did this, using
-`0` as the score:
+are looking up *Kill Bill* by typing in *Ki Bi* and hitting enter. Let's also
+assume there are a lot more users looking up *Kill Bill* than there are people
+interested in *Kindergarten Cop* (as weird as this assumption may sound, bear
+with me here). Remember when we associated the movies with the prefixes? We did
+this, using `0` as the score:
 
 ```
 ZADD moviesearch:index:ki 0 1
