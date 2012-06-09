@@ -264,11 +264,12 @@ ZADD moviesearch:index:ki 0 1
 
 Now, everytime a person looks up *Kill Bill* instead of *Kindergarten Cop* we
 can increment the score of the `1` entry (pointing to *Kill Bill*) in the
-`moviesearch:index:ki` set using [ZINCRBY](http://redis.io/commands/zincrby
-"Redis ZINCRBY command"). `ZINCRBY` increments the score of a given member in a
-given set by a given value. In order to sort our results by popularity we could
-increment the score of a given movie everytime a user looks that movie
-up. A simple method for doing this would probably look like this:
+`moviesearch:index:ki` set (and all the other sets containing `1`) using
+[ZINCRBY](http://redis.io/commands/zincrby "Redis ZINCRBY command"). `ZINCRBY`
+increments the score of a given member in a given set by a given value. In order
+to sort our results by popularity we could increment the score of a given movie
+everytime a user looks that movie up. A simple method for doing this would
+probably look like this:
 
 ```ruby
 def incr_score_for(movie_name, data_hash_key)
