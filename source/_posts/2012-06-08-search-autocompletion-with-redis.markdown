@@ -142,7 +142,7 @@ create a sorted set for every prefix. This set will include the key of the
 movies in which the prefix occurs and the pattern for those keys is the one
 Soulmate uses: `moviesearch:index:$PREFIX`.
 
-In order to associate the movie *The Dark Knight* and with its prefixes we need
+In order to associate the movie *The Dark Knight* with its prefixes we need
 to do the following for every prefix:
 
 ```
@@ -151,7 +151,7 @@ ZADD moviesearch:index:dar 0 9
 
 As you might have guessed, the prefix here is *dar*. The next number in this
 command is the score the member of this sorted set will have, but as I said,
-ignore this for now and keep in mind that the 9 is key of our `moviesearch:data`
+ignore this for now and keep in mind that the `9` is the key of our `moviesearch:data`
 hash pointing to the *The Dark Knight*. So we need to associate all prefixes of
 every moviename with its key in the `moviesearch:data` hash. Written in Ruby a
 method doing exactly that would look like this:
@@ -169,14 +169,15 @@ end
 That's pretty simple, isn't it? The method takes two arguments: the name of the
 movie and the key of the `moviesearch:data` hash pointing to its data. After
 using that method for all the movies we added to our data hash, we have a lot of
-sorted sets with its members being the keys for our data hash. That means, the
+sorted sets with its members being the keys for our data hash. That means, after
+adding *The Dark Knight* and *The Dark Knight Rises* the
 `moviesearch:index:dark` set has two members: `9` and `10`. So, what does that
 give us? How do we profit from this?
 
-Let's imagine a user is visiting our website and in the search form he's typing
+Let's imagine a user is visiting our website and using the search form he's typing
 *dar* into the input field.
 
-We now get all the entrys in `moviesearch:index:ki`, which are the keys of our
+We now get all the entries in `moviesearch:index:ki`, which are the keys of our
 moviesearch:data hash. The sorted set with the key `moviesearch:index:dar`
 contains `9` and `10` as members. With those numbers we can now just fetch all
 the hash entries with these as key and present them to the user. But
@@ -326,6 +327,11 @@ every prefix whose members point at our movies in the hash and in order to find
 movies containing multiple prefixes we use `ZINTERSTORE` as a cache to point us
 to the movies containing both. And now we've got search autocompletion
 presenting ordered results to the user matching multiple phrases!
+
+If you want to dig deeper, please read through the source code of Soulmate and
+study those two articles mentioned in the first paragraph. They both do a great
+job at explaining what exactly is going on here and why to use sorted sets and
+the other data types as we do.
 
 And if you're not [following me on Twitter](http://www.twitter.com/herrbrocken "Follow me!")
 you're missing out!
