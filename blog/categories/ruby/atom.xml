@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ruby | Written by Thorsten Ball]]></title>
   <link href="http://mrnugget.github.com/blog/categories/ruby/atom.xml" rel="self"/>
   <link href="http://mrnugget.github.com/"/>
-  <updated>2012-06-09T17:03:25+02:00</updated>
+  <updated>2012-06-09T17:30:53+02:00</updated>
   <id>http://mrnugget.github.com/</id>
   <author>
     <name><![CDATA[Thorsten Ball]]></name>
@@ -163,7 +163,7 @@ create a sorted set for every prefix. This set will include the key of the
 movies in which the prefix occurs and the pattern for those keys is the one
 Soulmate uses: <code>moviesearch:index:$PREFIX</code>.</p>
 
-<p>In order to associate the movie <em>The Dark Knight</em> and with its prefixes we need
+<p>In order to associate the movie <em>The Dark Knight</em> with its prefixes we need
 to do the following for every prefix:</p>
 
 <p><code>
@@ -172,7 +172,7 @@ ZADD moviesearch:index:dar 0 9
 
 <p>As you might have guessed, the prefix here is <em>dar</em>. The next number in this
 command is the score the member of this sorted set will have, but as I said,
-ignore this for now and keep in mind that the 9 is key of our <code>moviesearch:data</code>
+ignore this for now and keep in mind that the <code>9</code> is the key of our <code>moviesearch:data</code>
 hash pointing to the <em>The Dark Knight</em>. So we need to associate all prefixes of
 every moviename with its key in the <code>moviesearch:data</code> hash. Written in Ruby a
 method doing exactly that would look like this:</p>
@@ -193,14 +193,15 @@ end
 <p>That's pretty simple, isn't it? The method takes two arguments: the name of the
 movie and the key of the <code>moviesearch:data</code> hash pointing to its data. After
 using that method for all the movies we added to our data hash, we have a lot of
-sorted sets with its members being the keys for our data hash. That means, the
+sorted sets with its members being the keys for our data hash. That means, after
+adding <em>The Dark Knight</em> and <em>The Dark Knight Rises</em> the
 <code>moviesearch:index:dark</code> set has two members: <code>9</code> and <code>10</code>. So, what does that
 give us? How do we profit from this?</p>
 
-<p>Let's imagine a user is visiting our website and in the search form he's typing
+<p>Let's imagine a user is visiting our website and using the search form he's typing
 <em>dar</em> into the input field.</p>
 
-<p>We now get all the entrys in <code>moviesearch:index:ki</code>, which are the keys of our
+<p>We now get all the entries in <code>moviesearch:index:ki</code>, which are the keys of our
 moviesearch:data hash. The sorted set with the key <code>moviesearch:index:dar</code>
 contains <code>9</code> and <code>10</code> as members. With those numbers we can now just fetch all
 the hash entries with these as key and present them to the user. But
@@ -287,10 +288,12 @@ ZADD moviesearch:index:ki 0 1
 
 <p>Now, everytime a person looks up <em>Kill Bill</em> instead of <em>Kindergarten Cop</em> we
 can increment the score of the <code>1</code> entry (pointing to <em>Kill Bill</em>) in the
-<code>moviesearch:index:ki</code> set using <a href="http://redis.io/commands/zincrby" title="Redis ZINCRBY command">ZINCRBY</a>. <code>ZINCRBY</code> increments the score of a given member in a
-given set by a given value. In order to sort our results by popularity we could
-increment the score of a given movie everytime a user looks that movie
-up. A simple method for doing this would probably look like this:</p>
+<code>moviesearch:index:ki</code> set (and all the other sets containing <code>1</code>) using
+<a href="http://redis.io/commands/zincrby" title="Redis ZINCRBY command">ZINCRBY</a>. <code>ZINCRBY</code>
+increments the score of a given member in a given set by a given value. In order
+to sort our results by popularity we could increment the score of a given movie
+everytime a user looks that movie up. A simple method for doing this would
+probably look like this:</p>
 
 <p>```ruby
 def incr_score_for(movie_name, data_hash_key)
@@ -309,10 +312,12 @@ end
 member pointing to the movies data in the <code>moviesearch:data</code> hash.</p>
 
 <p>Now, before thinking about scores of set members we used <code>ZRANGE</code> to get the
-members of a given set. Working with scores now, the next time try to match a
-movie for given prfixes we use <a href="http://redis.io/commands/zrevrange" title="Redis ZREVRANGE command">ZREVRANGE</a> to return the matching hash keys ordered by their
-respective score. The following should then give us <em>Kill Bill</em> at the top
-after we incremented the score for this movie every time a user looks it up.</p>
+members of a given set. Working with scores now, the next time when we try to
+match a movie with the given prefixes we use
+<a href="http://redis.io/commands/zrevrange" title="Redis ZREVRANGE command">ZREVRANGE</a> to
+return the matching hash keys ordered by their respective score. The following
+should then give us <em>Kill Bill</em> at the top after we incremented the score for
+this movie every time a user looks it up.</p>
 
 <p><code>
 ZREVRANGE  moviesearch:index:ki 0 -1
@@ -351,6 +356,11 @@ every prefix whose members point at our movies in the hash and in order to find
 movies containing multiple prefixes we use <code>ZINTERSTORE</code> as a cache to point us
 to the movies containing both. And now we've got search autocompletion
 presenting ordered results to the user matching multiple phrases!</p>
+
+<p>If you want to dig deeper, please read through the source code of Soulmate and
+study those two articles mentioned in the first paragraph. They both do a great
+job at explaining what exactly is going on here and why to use sorted sets and
+the other data types as we do.</p>
 
 <p>And if you're not <a href="http://www.twitter.com/herrbrocken" title="Follow me!">following me on Twitter</a>
 you're missing out!</p>
