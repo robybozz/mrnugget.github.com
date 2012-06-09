@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Written by Thorsten Ball</title>
+  <title>Ordered Search Autocompletion With Redis - Written by Thorsten Ball</title>
   <meta name="author" content="Thorsten Ball">
 
   
@@ -20,7 +20,7 @@ amount of time. Since the next item on &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://mrnugget.github.com">
+  <link rel="canonical" href="http://mrnugget.github.com/blog/2012/06/08/search-autocompletion-with-redis">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -44,15 +44,12 @@ amount of time. Since the next item on &hellip;">
 </header>
   <div id="main">
     <div id="content">
-      <div class="blog-index">
+      <div>
+<article class="hentry" role="article">
   
-  
-  
-    <article>
-      
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2012/06/08/search-autocompletion-with-redis/">Ordered Search Autocompletion With Redis</a></h1>
+      <h1 class="entry-title">Ordered Search Autocompletion With Redis</h1>
     
     
       <p class="meta">
@@ -70,14 +67,14 @@ amount of time. Since the next item on &hellip;">
 
 <time datetime="2012-06-08T16:42:00+02:00" pubdate data-updated="true">Jun 8<span>th</span>, 2012</time>
         
-         | <a href="/blog/2012/06/08/search-autocompletion-with-redis/#disqus_thread">Comments</a>
+         | <a href="#disqus_thread">Comments</a>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>I spent the last weekend building a caching system for <a href="http://anygood.heroku.com" title="Any Good">AnyGood</a>
+<div class="entry-content"><p>I spent the last weekend building a caching system for <a href="http://anygood.heroku.com" title="Any Good">AnyGood</a>
 using <a href="http://www.redis.io" title="Redis">Redis</a> to save API responses for certain
 amount of time. Since the next item on my TODO list was autocompletion for my search
 form I started googling around looking for solutions involving Redis and I
@@ -477,27 +474,72 @@ presenting ordered results to the user matching multiple phrases!</p>
 <p>And if you&#8217;re not <a href="http://www.twitter.com/herrbrocken" title="Follow me!">following me on Twitter</a>
 you&#8217;re missing out!</p>
 </div>
+
+
+  <footer>
+    <p class="meta">
+      
   
+
+<span class="byline author vcard">Posted by <span class="fn">Thorsten Ball</span></span>
+
+      
+
+
+
+
+
+
+
+
   
 
 
-    </article>
+<time datetime="2012-06-08T16:42:00+02:00" pubdate data-updated="true">Jun 8<span>th</span>, 2012</time>
+      
+
+<span class="categories">
   
-  <div class="pagination">
+    <a class='category' href='/blog/categories/redis/'>Redis</a>, <a class='category' href='/blog/categories/ruby/'>Ruby</a>
+  
+</span>
+
+
+    </p>
     
-    <a href="/blog/archives">Blog Archives</a>
-    
-  </div>
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://mrnugget.github.com/blog/2012/06/08/search-autocompletion-with-redis/" data-via="herrbrocken" data-counturl="http://mrnugget.github.com/blog/2012/06/08/search-autocompletion-with-redis/" >Tweet</a>
+  
+  
+  
 </div>
+
+    
+    <p class="meta">
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
 <aside class="sidebar">
   
     <section>
   <h1>About Me</h1>
   <img src="/images/avatar.jpg">
-  <p>I&#8217;m 24 years old, living in Berlin, Germany and I want to write about
-  things that I&#8217;m interested in: Ruby, Ruby on Rails, Web Development, Music and
+  <p>I'm 24 years old, living in Berlin, Germany and I want to write about
+  things that I'm interested in: Ruby, Ruby on Rails, Web Development, Music and
   Guitars!</p>
-  <p>I&#8217;m currently doing an internship programming Ruby and developing web
+  <p>I'm currently doing an internship programming Ruby and developing web
   applications with Ruby on Rails.</p>
 </section>
 <section>
@@ -514,7 +556,7 @@ you&#8217;re missing out!</p>
 <section>
   <h1>Latest Tweets</h1>
   <ul id="tweets">
-    <li class="loading">Status updating&#8230;</li>
+    <li class="loading">Status updating...</li>
   </ul>
   <script type="text/javascript">
     $.domReady(function(){
@@ -533,6 +575,7 @@ you&#8217;re missing out!</p>
 
   
 </aside>
+
 
     </div>
   </div>
@@ -555,7 +598,10 @@ you&#8217;re missing out!</p>
       var disqus_shortname = 'writtenbythorstenball';
       
         
-        var disqus_script = 'count.js';
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://mrnugget.github.com/blog/2012/06/08/search-autocompletion-with-redis/';
+        var disqus_url = 'http://mrnugget.github.com/blog/2012/06/08/search-autocompletion-with-redis/';
+        var disqus_script = 'embed.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;

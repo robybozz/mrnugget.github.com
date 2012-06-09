@@ -4,7 +4,7 @@
   <title><![CDATA[Written by Thorsten Ball]]></title>
   <link href="http://mrnugget.github.com/atom.xml" rel="self"/>
   <link href="http://mrnugget.github.com/"/>
-  <updated>2012-05-28T18:37:06+02:00</updated>
+  <updated>2012-06-09T17:02:20+02:00</updated>
   <id>http://mrnugget.github.com/</id>
   <author>
     <name><![CDATA[Thorsten Ball]]></name>
@@ -14,11 +14,409 @@
 
   
   <entry>
-    <title type="html"><![CDATA[Here be dragons]]></title>
-    <link href="http://mrnugget.github.com/blog/2012/05/28/here-be-dragons/"/>
-    <updated>2012-05-28T18:36:00+02:00</updated>
-    <id>http://mrnugget.github.com/blog/2012/05/28/here-be-dragons</id>
-    <content type="html"><![CDATA[<p>&#8230; and there will be.</p>
+    <title type="html"><![CDATA[Ordered Search Autocompletion With Redis]]></title>
+    <link href="http://mrnugget.github.com/blog/2012/06/08/search-autocompletion-with-redis/"/>
+    <updated>2012-06-08T16:42:00+02:00</updated>
+    <id>http://mrnugget.github.com/blog/2012/06/08/search-autocompletion-with-redis</id>
+    <content type="html"><![CDATA[<p>I spent the last weekend building a caching system for <a href="http://anygood.heroku.com" title="Any Good">AnyGood</a>
+using <a href="http://www.redis.io" title="Redis">Redis</a> to save API responses for certain
+amount of time. Since the next item on my TODO list was autocompletion for my search
+form I started googling around looking for solutions involving Redis and I
+stumbled about two great posts examining this particular topic. The <a href="http://antirez.com/post/autocomplete-with-redis.html" title="Autocomplete with Redis">first one</a>
+written by Salvatore Sanfilippo is a great explanation on how to use
+Redis for autocompletion and goes in great detail when explainin the algorithm.
+And the <a href="http://patshaughnessy.net/2011/11/29/two-ways-of-using-redis-to-build-a-nosql-autocomplete-search-index" title="Two ways of using Redis to build a NoSQL autocomplete search index">second one</a>
+by Pat Shaughnessy is a great help when explaining Sanfilippos algorithm and comparing
+it to <a href="https://github.com/seatgeek/soulmate" title="Soulmate">Soulmate</a>, &#8220;a tool to
+help solve the common problem of developing a fast autocomplete feature. It uses
+Redis&#8217;s sorted sets to build an index of partially completed words and the
+corresponding top matching items, and provides a simple sinatra app to query
+them.&#8221;</p>
+
+<p>So I spent a good amount of time studying those articles and reading through the
+source code of Soulmate before I decided to write my own solution. Why? Because
+it was a rainy sunday afternoon, playing around with Redis is fun and I wanted
+to learn more about it. And after all, I wanted support for multiple phrases,
+search result ordering and Soulmate did all that and a bit more and just setting
+it up wouldn&#8217;t have the same learning effect. And since I was out to play, I
+might as well have fun. So I fired up Vim.</p>
+
+<h2>What it should do</h2>
+
+<p>Let&#8217;s suppose we want autocompletion for our search form that not only returns a
+single value for each proposed item but also comes with some data that we can
+present. Also, let&#8217;s go one step further and say that the search form
+should present the items available to the user in an ordered way, e.g. by
+popularity.</p>
+
+<p>So when a user types into the search form, we want to to show him all the
+possible movies matching his search phrases. That means the first thing we&#8217;ve
+got to do is dump this data in to Redis. Like Soulmate, we use a <a href="http://redis.io/topics/data-types#hashes" title="Redis Hashes">Redis hash</a>
+here, where each movie has its own unique key. This key can be anything as long
+as it&#8217;s unique. I&#8217;m using MD5 in Anygood, since I don&#8217;t save movies into a
+database and they don&#8217;t have a unique ID this context. But let&#8217;s suppose we do
+have an unique ID, dumping the data into Redis is pretty simple:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>HSET moviesearch:data 1 "{\"name\":\"Kill Bill\",\"year\":2003}"
+</span><span class='line'>HSET moviesearch:data 2 "{\"name\":\"King Kong\",\"year\":2005}"
+</span><span class='line'>HSET moviesearch:data 3 "{\"name\":\"Killer Elite\",\"year\":2011}"
+</span><span class='line'>HSET moviesearch:data 4 "{\"name\":\"Kill Bill 2\",\"year\":2004}"
+</span><span class='line'>HSET moviesearch:data 5 "{\"name\":\"Kilts for Bill\",\"year\":2027}"
+</span><span class='line'>HSET moviesearch:data 6 "{\"name\":\"Kids\",\"year\":1995}"
+</span><span class='line'>HSET moviesearch:data 7 "{\"name\":\"Kindergarten Cop\",\"year\":1990}"
+</span><span class='line'>HSET moviesearch:data 8 "{\"name\":\"The Green Mile\",\"year\":1999}"
+</span><span class='line'>HSET moviesearch:data 9 "{\"name\":\"The Dark Knight\",\"year\":2008}"
+</span><span class='line'>HSET moviesearch:data 10 "{\"name\":\"The Dark Knight Rises\",\"year\":2012}"</span></code></pre></td></tr></table></div></figure>
+
+
+<p><code>HSET</code> is the Redis command so save something into an hash. The key for this
+hash is <code>moviesearch:data</code>. The single keys for every movie in this hash are the
+unique IDs: <em>1, 2, 3, &#8230;</em>. And the data we&#8217;re saving are JSON strings, which
+are a pretty convenient way of saving objects in Redis. Also, it&#8217;s easy enough
+in Ruby to convert a Ruby hash to JSON and after retrieving it from Redis back
+to a hash:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;json&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1"># Before dumping to Redis:</span>
+</span><span class='line'><span class="p">{</span><span class="nb">name</span><span class="p">:</span> <span class="s1">&#39;Kill Bill&#39;</span><span class="p">,</span> <span class="n">year</span><span class="p">:</span> <span class="mi">2003</span><span class="p">}</span><span class="o">.</span><span class="n">to_json</span>
+</span><span class='line'><span class="c1"># =&gt; &quot;{\&quot;name\&quot;:\&quot;Kill Bill\&quot;,\&quot;year\&quot;:2003}&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1"># After retrieving from Redis:</span>
+</span><span class='line'><span class="no">JSON</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s2">&quot;{</span><span class="se">\&quot;</span><span class="s2">name</span><span class="se">\&quot;</span><span class="s2">:</span><span class="se">\&quot;</span><span class="s2">Kill Bill</span><span class="se">\&quot;</span><span class="s2">,</span><span class="se">\&quot;</span><span class="s2">year</span><span class="se">\&quot;</span><span class="s2">:2003}&quot;</span><span class="p">)</span>
+</span><span class='line'><span class="c1"># =&gt; {&quot;name&quot;=&gt;&quot;Kill Bill&quot;, &quot;year&quot;=&gt;2003}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Oh and btw. I&#8217;m using <a href="https://github.com/redis/redis-rb" title="redis-rb">redis-rb</a>
+as the Ruby client to connect to Redis, which does not only support Redis
+transactions and pipelining, but the best thing about this client is that the
+<a href="http://www.redis.io/commands" title="Redis commands">Redis commands</a> have the same
+name and take the same arguments (well, most of the time), which is especially
+great when getting to know Redis and looking up commands in the documentation.
+So now we&#8217;ve got the movies in Redis, how do we find them again?</p>
+
+<h2>Prefixes everywhere!</h2>
+
+<p>People are most likely trying to search for a movie by starting to type its name
+into the input field. And we want to present them the right movies before
+they&#8217;re even finished typing the whole name, right? That&#8217;s why we&#8217;re talking
+about autocompletion here. That means we need an association between word
+prefixes and the movies. If someone where to type in <em>The Dar</em> we want to
+show <em>The Dark Knight</em> and <em>The Dark Knight Rises</em> as possible search terms.
+Long story short: we need to get the prefixes of every movie we just dumped in our
+<code>moviesearch:data</code> hash. For that I&#8217;m using a simple method, which is heavily based
+on the one Sanfilippo uses in his example script:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">prefixes_for</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">prefixes</span> <span class="o">=</span> <span class="o">[]</span>
+</span><span class='line'>  <span class="n">words</span>    <span class="o">=</span> <span class="n">string</span><span class="o">.</span><span class="n">downcase</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">words</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">word</span><span class="o">|</span>
+</span><span class='line'>  <span class="p">(</span><span class="mi">1</span><span class="o">.</span><span class="n">.word</span><span class="o">.</span><span class="n">length</span><span class="p">)</span><span class="o">.</span><span class="n">each</span> <span class="p">{</span><span class="o">|</span><span class="n">i</span><span class="o">|</span> <span class="n">prefixes</span> <span class="o">&lt;&lt;</span> <span class="n">word</span><span class="o">[</span><span class="mi">0</span><span class="o">.</span><span class="n">.</span><span class="o">.</span><span class="n">i</span><span class="o">]</span> <span class="k">unless</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">1</span><span class="p">}</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">prefixes</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The movie with the name <em>The Dark Knight</em> will result in the following prefixes:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">prefixes_for</span><span class="p">(</span><span class="s1">&#39;The Dark Knight&#39;</span><span class="p">)</span>
+</span><span class='line'><span class="c1"># =&gt; [&quot;th&quot;, &quot;the&quot;, &quot;da&quot;, &quot;dar&quot;, &quot;dark&quot;, &quot;kn&quot;, &quot;kni&quot;, &quot;knig&quot;, &quot;knigh&quot;, &quot;knight&quot;]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And <em>The Dark Knight Rises</em> will result in the following prefixes:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">prefixes_for</span><span class="p">(</span><span class="s1">&#39;The Dark Knight Rises&#39;</span><span class="p">)</span>
+</span><span class='line'><span class="c1"># =&gt; [&quot;th&quot;, &quot;the&quot;, &quot;da&quot;, &quot;dar&quot;, &quot;dark&quot;, &quot;kn&quot;, &quot;kni&quot;, &quot;knig&quot;, &quot;knigh&quot;, &quot;knight&quot;, &quot;ri&quot;, &quot;ris&quot;, &quot;rise&quot;, &quot;rises&quot;]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We need to generate those prefixes for every movie we want to use in our search
+autocompletion and so I use a minimum prefix length of two characters here,
+because using one character prefixes is a lot of overhead for search completion
+where most people are going to type in more than one character.</p>
+
+<p>(Of course it&#8217;s entirely possible to not only use prefixes, but use every range
+of characters from any position in the word. Instead of using <em>fi, fis, fish</em>
+for <em>Fish</em>, we could use <em>fi, fis, fish, is, ish, sh</em>. But people are more
+likely to type the beginning of a word, I guess.)</p>
+
+<h2>Save those prefixes to sorted sets!</h2>
+
+<p>Redis uses <a href="http://redis.io/topics/data-types#sorted-sets" title="Sorted
+Sets">sorted sets</a> as a list of unique strings that can be ranked by a score. For now, we
+will ignore the score and just use this as a set where every entry is unique and
+trying to add a new one with the same name won&#8217;t result in a new entry. So let&#8217;s
+create a sorted set for every prefix. This set will include the key of the
+movies in which the prefix occurs and the pattern for those keys is the one
+Soulmate uses: <code>moviesearch:index:$PREFIX</code>.</p>
+
+<p>In order to associate the movie <em>The Dark Knight</em> and with its prefixes we need
+to do the following for every prefix:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">ZADD</span> <span class="n">moviesearch</span><span class="ss">:index:dar</span> <span class="mi">0</span> <span class="mi">9</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>As you might have guessed, the prefix here is <em>dar</em>. The next number in this
+command is the score the member of this sorted set will have, but as I said,
+ignore this for now and keep in mind that the 9 is key of our <code>moviesearch:data</code>
+hash pointing to the <em>The Dark Knight</em>. So we need to associate all prefixes of
+every moviename with its key in the <code>moviesearch:data</code> hash. Written in Ruby a
+method doing exactly that would look like this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">add_movie</span><span class="p">(</span><span class="n">movie_name</span><span class="p">,</span> <span class="n">data_hash_key</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">prefixes</span> <span class="o">=</span> <span class="n">prefixes_for</span><span class="p">(</span><span class="n">movie_name</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">prefixes</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">prefix</span><span class="o">|</span>
+</span><span class='line'>    <span class="no">REDIS</span><span class="o">.</span><span class="n">zadd</span><span class="p">(</span><span class="s2">&quot;moviesearch:index:</span><span class="si">#{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">data_hash_key</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>That&#8217;s pretty simple, isn&#8217;t it? The method takes two arguments: the name of the
+movie and the key of the <code>moviesearch:data</code> hash pointing to its data. After
+using that method for all the movies we added to our data hash, we have a lot of
+sorted sets with its members being the keys for our data hash. That means, the
+<code>moviesearch:index:dark</code> set has two members: <code>9</code> and <code>10</code>. So, what does that
+give us? How do we profit from this?</p>
+
+<p>Let&#8217;s imagine a user is visiting our website and in the search form he&#8217;s typing
+<em>dar</em> into the input field.</p>
+
+<p>We now get all the entrys in <code>moviesearch:index:ki</code>, which are the keys of our
+moviesearch:data hash. The sorted set with the key <code>moviesearch:index:dar</code>
+contains <code>9</code> and <code>10</code> as members. With those numbers we can now just fetch all
+the hash entries with these as key and present them to the user. But
+let&#8217;s see how that works.</p>
+
+<h2>Matching more than one word using Redis&#8217; <code>ZINTERSTORE</code></h2>
+
+<p>If we want to get all the entries for <code>moviesearch:index:ki</code> we use the ZRANGE
+command provided by Redis:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">ZRANGE</span> <span class="n">moviesearch</span><span class="ss">:index:dar</span> <span class="mi">0</span> <span class="o">-</span><span class="mi">1</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Starting from the first element (<code>0</code> since Redis starts indexing with 0) and going
+to the last (<code>-1</code>) we get the hash keys for movies whose names contain the prefix &#8216;dar&#8217;:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>redis-cli ZRANGE moviesearch:index:dar 0 -1
+</span><span class='line'>1<span class="o">)</span> <span class="s2">&quot;9&quot;</span>
+</span><span class='line'>2<span class="o">)</span> <span class="s2">&quot;10&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And now, let&#8217;s fetch all the entries from our <code>moviesearch:data</code> with those
+keys:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>redis-cli HMGET moviesearch:data 9 10
+</span><span class='line'>1<span class="o">)</span> <span class="s2">&quot;{\&quot;name\&quot;:\&quot;The Dark Knight Rises\&quot;,\&quot;year\&quot;:2008}&quot;</span>
+</span><span class='line'>2<span class="o">)</span> <span class="s2">&quot;{\&quot;name\&quot;:\&quot;The Dark Knight\&quot;,\&quot;year\&quot;:2008}&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Instead of using <code>HGET</code> we use <code>HMGET</code> to fetch multiple hash entries. That&#8217;s
+quite neat! Now we have all the movies containing a word that starts with
+&#8216;dar&#8217;. And we could present those to the user, who is typing and waiting for
+suggestions. Let&#8217;s go one step further though:</p>
+
+<p>Let&#8217;s suppose a user has typed <em>ki bi</em> into our search form. We now want to
+present him <em>Kill Bill, </em>Kill Bill 2<em>, </em>Kilts for Bill<em> as suggestions, but not
+</em>Killer Elite<em> and not </em>King Kong*. That means we need to find a movie
+containing both those prefixes in its name and not only one of them. And this is
+exactly where Redis&#8217; <a href="http://redis.io/commands/zinterstore" title="Redis ZINTERSTORE command">ZINTERSTORE</a>
+comes out to play.</p>
+
+<p><code>ZINTERSTORE</code> creates a new sorted with a given key containing all the members
+occuring in the sets passed to it. Let&#8217;s use it to create a temporary set
+containing the hash keys of the movies having &#8216;ki bi&#8217; in their names:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>redis-cli ZINTERSTORE moviesearch:index:ki|bi 2 moviesearch:index:ki moviesearch:index:bi
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>What happens here? <code>ZINTERSTORE</code> looks up which members are in both
+<code>moviesearch:index:ki</code> and <code>moviesearch:index:bi</code> and creates a new sorted set
+with the key <code>moviesearch:index:ki|bi</code> containing those members. The pattern for
+this key is also from Soulmate: dig through the code as there are lots of great
+ideas! Now we can use the <code>ZRANGE</code> command again and see which movies contain
+those prefixes:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>redis-cli ZRANGE <span class="s1">&#39;moviesearch:index:ki|bi&#39;</span>
+</span><span class='line'>1<span class="o">)</span> <span class="s2">&quot;1&quot;</span>
+</span><span class='line'>2<span class="o">)</span> <span class="s2">&quot;4&quot;</span>
+</span><span class='line'>3<span class="o">)</span> <span class="s2">&quot;5&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And those are exactly the keys pointing to <em>Kill Bill</em>, <em>Kill Bill 2</em> and <em>Kilts
+For Bill</em> in the <code>moviesearch:data</code> hash! Great! All we have to do now is use
+<code>HMGET</code> to get the data for those keys from the hash and present them to the
+user.</p>
+
+<h2>Score &amp; Popularity</h2>
+
+<p>Until now we ignored the score of our sorted sets. But let&#8217;s say all our users
+are looking up <em>Kill Bill</em> by typing in <em>Ki Bi</em> and hitting enter.</p>
+
+<p>Let&#8217;s also assume there are a lot more users looking up <em>Kill Bill</em> than there
+are people interested in <em>Kindergarten Cop</em> (as weird as this assumption may
+sound, bear with me here).</p>
+
+<p>Remember when we associated the movies with the prefixes? We did this, using
+<code>0</code> as the score:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>ZADD moviesearch:index:ki 0 1
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now, everytime a person looks up <em>Kill Bill</em> instead of <em>Kindergarten Cop</em> we
+can increment the score of the <code>1</code> entry (pointing to <em>Kill Bill</em>) in the
+<code>moviesearch:index:ki</code> set using <a href="http://redis.io/commands/zincrby" title="Redis ZINCRBY command">ZINCRBY</a>. <code>ZINCRBY</code> increments the score of a given member in a
+given set by a given value. In order to sort our results by popularity we could
+increment the score of a given movie everytime a user looks that movie
+up. A simple method for doing this would probably look like this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">incr_score_for</span><span class="p">(</span><span class="n">movie_name</span><span class="p">,</span> <span class="n">data_hash_key</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">prefixes</span>    <span class="o">=</span> <span class="n">prefixes_for</span><span class="p">(</span><span class="n">movie_name</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">prefixes</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">prefix</span><span class="o">|</span>
+</span><span class='line'>    <span class="no">REDIS</span><span class="o">.</span><span class="n">zincrby</span><span class="p">(</span><span class="n">index_key_for</span><span class="p">(</span><span class="n">prefix</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="n">data_hash_key</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We take every prefix occuring in the movie name and increment the score of the
+member pointing to the movies data in the <code>moviesearch:data</code> hash.</p>
+
+<p>Now, before thinking about scores of set members we used <code>ZRANGE</code> to get the
+members of a given set. Working with scores now, the next time try to match a
+movie for given prfixes we use <a href="http://redis.io/commands/zrevrange" title="Redis ZREVRANGE command">ZREVRANGE</a> to return the matching hash keys ordered by their
+respective score. The following should then give us <em>Kill Bill</em> at the top
+after we incremented the score for this movie every time a user looks it up.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">ZREVRANGE</span>  <span class="n">moviesearch</span><span class="ss">:index:ki</span> <span class="mi">0</span> <span class="o">-</span><span class="mi">1</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Using <code>ZREVRANGE</code>, <code>ZUNIONSTORE</code> and <code>HMGET</code> combined we can write a Ruby method
+to look up movies matching the passed prefixes and order them by score:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">find_by_prefixes</span><span class="p">(</span><span class="n">prefixes</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">intersection_key</span> <span class="o">=</span> <span class="n">index_key_for</span><span class="p">(</span><span class="n">prefixes</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">index_keys</span>       <span class="o">=</span> <span class="n">prefixes</span><span class="o">.</span><span class="n">map</span> <span class="p">{</span><span class="o">|</span><span class="n">prefix</span><span class="o">|</span> <span class="n">index_key_for</span><span class="p">(</span><span class="n">prefix</span><span class="p">)}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="no">REDIS</span><span class="o">.</span><span class="n">zinterstore</span><span class="p">(</span><span class="n">intersection_key</span><span class="p">,</span> <span class="n">index_keys</span><span class="p">)</span>
+</span><span class='line'>  <span class="no">REDIS</span><span class="o">.</span><span class="n">expire</span><span class="p">(</span><span class="n">intersection_key</span><span class="p">,</span> <span class="mi">7200</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">data_hash_keys</span>  <span class="o">=</span> <span class="no">REDIS</span><span class="o">.</span><span class="n">zrevrange</span><span class="p">(</span><span class="n">intersection_key</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">matching_movies</span> <span class="o">=</span> <span class="no">REDIS</span><span class="o">.</span><span class="n">hmget</span><span class="p">(</span><span class="n">data_key</span><span class="p">,</span> <span class="o">*</span><span class="n">data_hash_keys</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">matching_movies</span><span class="o">.</span><span class="n">map</span> <span class="p">{</span><span class="o">|</span><span class="n">movie</span><span class="o">|</span> <span class="no">JSON</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">movie</span><span class="p">,</span> <span class="n">symbolize_names</span><span class="p">:</span> <span class="kp">true</span><span class="p">)}</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This method takes an array of prefixes as argument, creating the index keys for
+them, then it creates a temporary sorted set using <code>ZINTERSTORE</code> (<code>EXPIRE</code> tells Redis to delete a
+given key after the specified time in seconds) containing the data hash keys
+pointing to the movies. After that <code>ZREVRANGE</code> gets us all the members of this
+set ordered by their score and finally <code>HMGET</code> is used to get the data for all
+the matching keys from the <code>moviesearch:data</code> hash. There are a couple of helper
+methods involved, but it should still be pretty clear what happens. If not, look
+at the code of the whole <code>MovieMatcher</code> class I use in Anygood
+<a href="https://gist.github.com/2900740" title="Anygood MovieMatcher class">here</a>.</p>
+
+<p>So everything combined we use Redis hashes to save our data, sorted sets for
+every prefix whose members point at our movies in the hash and in order to find
+movies containing multiple prefixes we use <code>ZINTERSTORE</code> as a cache to point us
+to the movies containing both. And now we&#8217;ve got search autocompletion
+presenting ordered results to the user matching multiple phrases!</p>
+
+<p>And if you&#8217;re not <a href="http://www.twitter.com/herrbrocken" title="Follow me!">following me on Twitter</a>
+you&#8217;re missing out!</p>
 ]]></content>
   </entry>
   
