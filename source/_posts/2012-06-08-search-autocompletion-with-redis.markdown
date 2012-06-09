@@ -285,11 +285,12 @@ We take every prefix occuring in the movie name and increment the score of the
 member pointing to the movies data in the `moviesearch:data` hash.
 
 Now, before thinking about scores of set members we used `ZRANGE` to get the
-members of a given set. Working with scores now, the next time try to match a
-movie for given prfixes we use [ZREVRANGE](http://redis.io/commands/zrevrange
-"Redis ZREVRANGE command") to return the matching hash keys ordered by their
-respective score. The following should then give us *Kill Bill* at the top
-after we incremented the score for this movie every time a user looks it up.
+members of a given set. Working with scores now, the next time when we try to
+match a movie with the given prefixes we use
+[ZREVRANGE](http://redis.io/commands/zrevrange "Redis ZREVRANGE command") to
+return the matching hash keys ordered by their respective score. The following
+should then give us *Kill Bill* at the top after we incremented the score for
+this movie every time a user looks it up.
 
 ```
 ZREVRANGE  moviesearch:index:ki 0 -1
