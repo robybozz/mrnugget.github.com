@@ -1,17 +1,32 @@
+// function getNav() {
+//   var mobileNav = $('nav[role=navigation] fieldset[role=search]').after('<fieldset class="mobile-nav"></fieldset>').next().append('<select></select>');
+//   mobileNav.children('select').append('<option value="">Navigate&hellip;</option>');
+//   $('ul[role=main-navigation]').addClass('main-navigation');
+//   $('ul.main-navigation a').each(function(link) {
+//     mobileNav.children('select').append('<option value="'+link.href+'">&raquo; '+link.text+'</option>');
+//   });
+//   $('ul.subscription a').each(function(link) {
+//     mobileNav.children('select').append('<option value="'+link.href+'">&raquo; '+link.text+'</option>');
+//   });
+//   mobileNav.children('select').bind('change', function(event) {
+//     if (event.target.value) { window.location.href = event.target.value; }
+//   });
+// }
 function getNav() {
-  var mobileNav = $('nav[role=navigation] fieldset[role=search]').after('<fieldset class="mobile-nav"></fieldset>').next().append('<select></select>');
-  mobileNav.children('select').append('<option value="">Navigate&hellip;</option>');
-  $('ul[role=main-navigation]').addClass('main-navigation');
-  $('ul.main-navigation a').each(function(link) {
-    mobileNav.children('select').append('<option value="'+link.href+'">&raquo; '+link.text+'</option>');
+  var mainNav = $('ul.main-navigation, ul[role=main-navigation]').before('<fieldset class="mobile-nav">')
+  var mobileNav = $('fieldset.mobile-nav').append('<select>');
+  mobileNav.find('select').append('<option value="">Navigate&hellip;</option>');
+  mainNav.find('a').each(function() {
+    mobileNav.find('select').append('<option value="'+this.href+'">&raquo; '+this.text+'</option>');
   });
-  $('ul.subscription a').each(function(link) {
-    mobileNav.children('select').append('<option value="'+link.href+'">&raquo; '+link.text+'</option>');
+  $('ul.subscription a').each(function() {
+    mobileNav.find('select').append('<option value="'+this.href+'">&raquo; '+this.text+'</option>');
   });
-  mobileNav.children('select').bind('change', function(event) {
+  mobileNav.find('select').bind('change', function(event) {
     if (event.target.value) { window.location.href = event.target.value; }
   });
 }
+
 
 function addSidebarToggler() {
   if(!$('body').hasClass('sidebar-footer')) {
