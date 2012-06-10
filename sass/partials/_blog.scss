@@ -1,5 +1,5 @@
 article {
-  background: none;
+  background: $img-border bottom left repeat-x;
   padding-top: 1em;
   a { @extend .force-wrap; }
   header {
@@ -128,7 +128,7 @@ article + article {
   font-size: .95em;
   position: relative;
   border-top: none;
-  background: $img-border top left repeat-x;
+  background: none;
   padding: {top: 1.5em; bottom: 1.5em;}
   a {
     text-decoration: none;
