@@ -6,7 +6,7 @@ url: http://mrnugget.github.com
 title: Written by Thorsten Ball
 subtitle: 
 author: Thorsten Ball
-simple_search: http://google.com/search
+simple_search: 
 description: Berlin based web developer writing about Ruby, Ruby on Rails and whatever else he's thinking about
 
 # Default date format is "ordinal" (resulting in "July 22nd 2007")
@@ -94,7 +94,7 @@ disqus_short_name: writtenbythorstenball
 disqus_show_comment_count: true
 
 # Google Analytics
-google_analytics_tracking_id:
+google_analytics_tracking_id: UA-32543112-1
 
 # Facebook Like
 facebook_like: false
