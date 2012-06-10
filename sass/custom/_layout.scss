@@ -41,7 +41,7 @@ body {
   margin: 0;
   padding: 0 $pad-medium 1px;
   background: $sidebar-bg;
-  border-top: 1px solid lighten($sidebar-border, 4);
+  border-top: none;
   section {
     &.odd, &.even { float: left; width: 48%; }
     &.odd { margin-left: 0; }

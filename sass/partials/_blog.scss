@@ -127,8 +127,8 @@ article + article {
   text-align: center;
   font-size: .95em;
   position: relative;
-  border-top: 1px solid desaturate(darken($sidebar-bg-color, 7), 10);
-  background: none;
+  border-top: none;
+  background: $img-border top left repeat-x;
   padding: {top: 1.5em; bottom: 1.5em;}
   a {
     text-decoration: none;
