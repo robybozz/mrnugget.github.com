@@ -27,7 +27,8 @@ it was a rainy sunday afternoon, playing around with Redis is fun and I wanted
 to learn more about it. And after all, I wanted support for multiple phrases,
 search result ordering and Soulmate did all that and a bit more and just setting
 it up wouldn't have the same learning effect. And since I was out to play, I
-might as well have fun. So I fired up Vim.
+might as well have fun. So let's see how to this...
+<!-- more -->
 
 ## What it should do
 
