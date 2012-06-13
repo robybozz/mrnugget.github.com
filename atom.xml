@@ -4,7 +4,7 @@
   <title><![CDATA[Written by Thorsten Ball]]></title>
   <link href="http://mrnugget.github.com/atom.xml" rel="self"/>
   <link href="http://mrnugget.github.com/"/>
-  <updated>2012-06-10T17:32:39+02:00</updated>
+  <updated>2012-06-13T18:54:29+02:00</updated>
   <id>http://mrnugget.github.com/</id>
   <author>
     <name><![CDATA[Thorsten Ball]]></name>
@@ -39,7 +39,10 @@ it was a rainy sunday afternoon, playing around with Redis is fun and I wanted
 to learn more about it. And after all, I wanted support for multiple phrases,
 search result ordering and Soulmate did all that and a bit more and just setting
 it up wouldn&#8217;t have the same learning effect. And since I was out to play, I
-might as well have fun. So I fired up Vim.</p>
+might as well have fun. So let&#8217;s see how to this&#8230;</p>
+
+<!-- more -->
+
 
 <h2>What it should do</h2>
 
