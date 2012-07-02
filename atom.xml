@@ -4,7 +4,7 @@
   <title><![CDATA[Written by Thorsten Ball]]></title>
   <link href="http://mrnugget.github.com/atom.xml" rel="self"/>
   <link href="http://mrnugget.github.com/"/>
-  <updated>2012-07-02T18:17:46+02:00</updated>
+  <updated>2012-07-02T18:19:56+02:00</updated>
   <id>http://mrnugget.github.com/</id>
   <author>
     <name><![CDATA[Thorsten Ball]]></name>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[How I used 98840 commands less and saved 4 seconds]]></title>
-    <link href="http://mrnugget.github.com/blog/2012/06/20/how-i-saved-200000-commands-and-a-few-seconds/"/>
+    <link href="http://mrnugget.github.com/blog/2012/06/20/how-i-used-98840-commands-less-and-saved-4-seconds/"/>
     <updated>2012-06-20T18:58:00+02:00</updated>
-    <id>http://mrnugget.github.com/blog/2012/06/20/how-i-saved-200000-commands-and-a-few-seconds</id>
+    <id>http://mrnugget.github.com/blog/2012/06/20/how-i-used-98840-commands-less-and-saved-4-seconds</id>
     <content type="html"><![CDATA[<p>In my last post I explained how to implement a search autocompletion backend
 using Redis. This week I used the described implementation with its <code>add_movie</code> method to put thousands of movies into my Redis database
 in order to use them for the autocompletion on
