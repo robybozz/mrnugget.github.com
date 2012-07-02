@@ -9,9 +9,8 @@
   <meta name="author" content="Thorsten Ball">
 
   
-  <meta name="description" content="I spent the last weekend building a caching system for AnyGood
-using Redis to save API responses for certain
-amount of time. Since the next item on &hellip;">
+  <meta name="description" content="In my last post I explained how to implement a search autocompletion backend
+using Redis. This week I used the described implementation with its &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -67,6 +66,95 @@ amount of time. Since the next item on &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/06/20/how-i-saved-200000-commands-and-a-few-seconds/">How I Used 98840 Commands Less and Saved 4 Seconds</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-06-20T18:58:00+02:00" pubdate data-updated="true">Jun 20<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/06/20/how-i-saved-200000-commands-and-a-few-seconds/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>In my last post I explained how to implement a search autocompletion backend
+using Redis. This week I used the described implementation with its <code>add_movie</code> method to put thousands of movies into my Redis database
+in order to use them for the autocompletion on
+<a href="http://anygood.heroku.com" title="AnyGood - Check if a movie was
+any good!">anygood.heroku.com</a>. It&#8217;s the same method as described in the last post, but with
+important change I didn&#8217;t think about too much: I did not overwrite the score of the members in the sorted
+sets. The method I used for adding movies looked like this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">add_movie</span><span class="p">(</span><span class="n">movie_hash</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">prefixes</span>    <span class="o">=</span> <span class="n">prefixes_for</span><span class="p">(</span><span class="n">movie_hash</span><span class="o">[</span><span class="ss">:name</span><span class="o">]</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">hashed_name</span> <span class="o">=</span> <span class="n">data_hash_key_for</span><span class="p">(</span><span class="n">movie_hash</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">prefixes</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">prefix</span><span class="o">|</span>
+</span><span class='line'>    <span class="n">score</span> <span class="o">=</span> <span class="no">REDIS</span><span class="o">.</span><span class="n">zscore</span><span class="p">(</span><span class="n">index_key_for</span><span class="p">(</span><span class="n">prefix</span><span class="p">),</span> <span class="n">hashed_name</span><span class="p">)</span><span class="o">.</span><span class="n">to_i</span> <span class="o">||</span> <span class="mi">0</span>
+</span><span class='line'>    <span class="no">REDIS</span><span class="o">.</span><span class="n">zadd</span><span class="p">(</span><span class="n">index_key_for</span><span class="p">(</span><span class="n">prefix</span><span class="p">),</span> <span class="n">score</span><span class="p">,</span> <span class="n">hashed_name</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="no">REDIS</span><span class="o">.</span><span class="n">hset</span><span class="p">(</span><span class="n">data_key</span><span class="p">,</span> <span class="n">hashed_name</span><span class="p">,</span> <span class="n">movie_hash</span><span class="o">.</span><span class="n">to_json</span><span class="p">)</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And adding movies took suspiciously long, longer than I thought it would and
+looking at it now it&#8217;s pretty easy to tell why: it was exactly that small change
+that lowered the speed of my importing process, I <em>did</em> cache the member score
+in <em>every</em> prefix set and then used in the <code>REDIS.zadd</code> line. Every time a movie
+was added, for each of its prefixes the score of the correspondent sorted set
+member was saved and used again. That&#8217;s not bad at all, no, it didn&#8217;t slip in
+there either! Heck, I wrote tests for this. But looking at the code I concluded
+that it was not a feature I needed. Using the code above, every movie would have
+a different rank in the autocomplete output according to the user input. One
+movie could be ranked higher when the user typed in <em>the</em> and ranked lower when
+the input was <em>dark</em>. That is pretty cool, but I wanted a different behaviour:
+the sorted set members associated with one movie should have one score, the same
+one in every set. And after running some benchmarks I found out how implementing
+the wrong behaviour slowed me down.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/06/20/how-i-saved-200000-commands-and-a-few-seconds/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -153,6 +241,10 @@ might as well have fun. So let&#8217;s see how to this&#8230;</p>
 <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/06/20/how-i-saved-200000-commands-and-a-few-seconds/">How I used 98840 commands less and saved 4 seconds</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2012/06/08/search-autocompletion-with-redis/">Ordered Search Autocompletion With Redis</a>
