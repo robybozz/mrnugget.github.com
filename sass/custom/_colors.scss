@@ -74,7 +74,7 @@ $nav-bg: #FCFCF2;
 $nav-bg-front: none;
 $nav-bg-back: none; 
 $nav-color: #000 !default;
-$nav-color-hover: darken($nav-color, 25) !default;
+$nav-color-hover: adjust-color($link-color, $lightness: 10, $saturation: 25) !default;
 $nav-placeholder: desaturate(darken($nav-bg, 10), 15) !default;
 $nav-border: none;
 $nav-border-top: none;

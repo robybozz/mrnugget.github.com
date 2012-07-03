@@ -28,8 +28,8 @@ def add_movie(movie_hash)
 end
 ```
 
-And adding movies took suspiciously long, longer than I thought it would and
-looking at it now it's pretty easy to tell why: it was exactly that small change
+Adding movies took suspiciously long, longer than I thought it would.
+Looking at it now it's pretty easy to tell why: it was exactly that small change
 that lowered the speed of my importing process, I *did* cache the member score
 in *every* prefix set and then used in the `REDIS.zadd` line. Every time a movie
 was added, for each of its prefixes the score of the correspondent sorted set
@@ -139,7 +139,7 @@ ruby insert_10000_movies_with_one_prefix.rb  4.42s user 2.19s system 54% cpu 12.
 ## Redis and the Pipeline
 
 I wasn't satisfied with this result and while examining the code again I
-remembered [Redis pipelining abilities.](http://www.redis.io/topics/pipelining "Redis pipelining documentation").
+remembered [Redis pipelining abilities.](http://www.redis.io/topics/pipelining "Redis pipelining documentation")
 
 When sending requests to Redis using pipelining the server doesn't wait
 for the client (our code) to progress its responses, it just accepts them and
