@@ -4,7 +4,7 @@
   <title><![CDATA[Written by Thorsten Ball]]></title>
   <link href="http://mrnugget.github.com/atom.xml" rel="self"/>
   <link href="http://mrnugget.github.com/"/>
-  <updated>2012-07-02T18:19:56+02:00</updated>
+  <updated>2012-07-03T05:19:14+02:00</updated>
   <id>http://mrnugget.github.com/</id>
   <author>
     <name><![CDATA[Thorsten Ball]]></name>
@@ -51,8 +51,8 @@ sets. The method I used for adding movies looked like this:</p>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>And adding movies took suspiciously long, longer than I thought it would and
-looking at it now it&#8217;s pretty easy to tell why: it was exactly that small change
+<p>Adding movies took suspiciously long, longer than I thought it would.
+Looking at it now it&#8217;s pretty easy to tell why: it was exactly that small change
 that lowered the speed of my importing process, I <em>did</em> cache the member score
 in <em>every</em> prefix set and then used in the <code>REDIS.zadd</code> line. Every time a movie
 was added, for each of its prefixes the score of the correspondent sorted set
@@ -221,7 +221,7 @@ commands less it only takes around <em>4</em>:</p>
 <h2>Redis and the Pipeline</h2>
 
 <p>I wasn&#8217;t satisfied with this result and while examining the code again I
-remembered <a href="http://www.redis.io/topics/pipelining" title="Redis pipelining documentation">Redis pipelining abilities.</a>.</p>
+remembered <a href="http://www.redis.io/topics/pipelining" title="Redis pipelining documentation">Redis pipelining abilities.</a></p>
 
 <p>When sending requests to Redis using pipelining the server doesn&#8217;t wait
 for the client (our code) to progress its responses, it just accepts them and

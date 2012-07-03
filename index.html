@@ -130,8 +130,8 @@ sets. The method I used for adding movies looked like this:</p>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>And adding movies took suspiciously long, longer than I thought it would and
-looking at it now it&#8217;s pretty easy to tell why: it was exactly that small change
+<p>Adding movies took suspiciously long, longer than I thought it would.
+Looking at it now it&#8217;s pretty easy to tell why: it was exactly that small change
 that lowered the speed of my importing process, I <em>did</em> cache the member score
 in <em>every</em> prefix set and then used in the <code>REDIS.zadd</code> line. Every time a movie
 was added, for each of its prefixes the score of the correspondent sorted set
