@@ -21,13 +21,15 @@ $pad-wide: 55px;
 //$sidebar-pad-medium: 15px;
 //$sidebar-pad-wide: 20px;
 //$sidebar-width-wide: 300px;
+html {
+  border-top: 5px solid #000000;
+}
 body {
   > header {
     text-align: center;
   }
   > nav {
     background: $img-border bottom left repeat-x;
-    text-align: center;
   }
   > footer {
     background: $img-border top left repeat-x;

@@ -58,17 +58,17 @@ $text-color: #222 !default;
 $text-color-light: #aaa !default;
 $type-border: #ddd !default;
 
+// $sidebar-bg: image-url('noise.png');
 $sidebar-bg-color: #FCFCF2;
-$sidebar-bg: image-url('noise.png');
-$sidebar-link-color: $link-color !default;
-$sidebar-link-color-hover: $link-color-hover !default;
-$sidebar-link-color-active: $link-color-active !default;
-$sidebar-color: $text-color;
-$sidebar-border: desaturate(darken($sidebar-bg-color, 7), 10) !default;
-$sidebar-border-hover: darken($sidebar-bg-color, 7) !default;
-$sidebar-link-color-subdued: lighten($sidebar-color, 20) !default;
-$sidebar-link-color-subdued-hover: $sidebar-link-color-hover !default;
-$twitter-status-link: lighten($sidebar-link-color-subdued, 15) !default;
+// $sidebar-color: $text-color;
+// $sidebar-link-color: $link-color !default;
+// $sidebar-link-color-hover: $link-color-hover !default;
+// $sidebar-link-color-active: $link-color-active !default;
+// $sidebar-border: desaturate(darken($sidebar-bg-color, 7), 10) !default;
+// $sidebar-border-hover: darken($sidebar-bg-color, 7) !default;
+// $sidebar-link-color-subdued: lighten($sidebar-color, 20) !default;
+// $sidebar-link-color-subdued-hover: $sidebar-link-color-hover !default;
+// $twitter-status-link: lighten($sidebar-link-color-subdued, 15) !default;
 
 $nav-bg: #FCFCF2;
 $nav-bg-front: none;
