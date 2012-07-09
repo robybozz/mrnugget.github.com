@@ -3,7 +3,7 @@ layout: post
 title: "Vim Learning Resources"
 date: 2012-07-08 18:52
 comments: true
-published: true
+published: false
 categories: 
 ---
 
