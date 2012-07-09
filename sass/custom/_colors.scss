@@ -49,9 +49,9 @@ $page-border-bottom: none;
 $page-bg: #FCFCF2 image-url('noise.png');
 $header-bg: $img-border bottom left repeat-x;
 
-$link-color: lighten(#FF1E00, 3) !default;
-$link-color-hover: adjust-color($link-color, $lightness: 10, $saturation: 25) !default;
-$link-color-visited: adjust-color($link-color, $hue: 20, $lightness: -4) !default;
+$link-color: lighten(#DB0000, 3) !default;
+$link-color-hover: adjust-color($link-color, $lightness: +25%, $saturation: 25) !default;
+$link-color-visited: adjust-color($link-color, $lightness: -15) !default;
 $link-color-active: adjust-color($link-color-hover, $lightness: -15) !default;
 
 $text-color: #222 !default;
