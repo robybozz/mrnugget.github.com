@@ -4,7 +4,7 @@
   <title><![CDATA[Written by Thorsten Ball]]></title>
   <link href="http://mrnugget.github.com/atom.xml" rel="self"/>
   <link href="http://mrnugget.github.com/"/>
-  <updated>2012-07-09T15:57:25+02:00</updated>
+  <updated>2012-07-09T15:58:24+02:00</updated>
   <id>http://mrnugget.github.com/</id>
   <author>
     <name><![CDATA[Thorsten Ball]]></name>
@@ -12,88 +12,6 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
-  
-  <entry>
-    <title type="html"><![CDATA[Vim Learning Resources]]></title>
-    <link href="http://mrnugget.github.com/blog/2012/07/08/vim-learning-resources/"/>
-    <updated>2012-07-08T18:52:00+02:00</updated>
-    <id>http://mrnugget.github.com/blog/2012/07/08/vim-learning-resources</id>
-    <content type="html"><![CDATA[<h2>Video Tutorials</h2>
-
-<ul>
-<li><a href="http://www.vimcasts.org" title="Vimcasts.org">vimcasts.org</a>: This site by Drew Neil
-is great: over 35 screencasts showing you what can be done with Vim and
-plugins.</li>
-<li><a href="http://http://www.derekwyatt.org/vim/vim-tutorial-videos/" title="Derek Wyatt's Vim Tutorial Videos">Derek Wyatt&#8217;s Vim videos</a>:
-This site is one of the most hidden gems in the Vim galaxy and I don&#8217;t know
-why. Derek Wyatt has an immense knowledge of Vim and his videos are great,
-explaining nearly everything about Vim for absolute beginners to experts and
-then some.</li>
-<li><p><a href="https://peepcode.com/products/smash-into-vim-i" title="Smash Into Vim">PeepCode - Smash Into Vim</a>:
-Great video, $12</p></li>
-<li><p><a href="http://blog.extracheese.org/2010/11/screencast-custom-vim-refactorings.html" title="Screencast: Custom Vim Refactorings">Gary Bernhardts Videos</a>:
-This is Gary Bernhardt going full speed with Vim and showing off some
-incredible knowlege of this editor. Check out his destroyallsoftware
-screencasts.</p></li>
-</ul>
-
-
-<h2>Blog Posts</h2>
-
-<ul>
-<li><a href="http://address" title="title">Coming Home To Vim</a>: Great post by Steve Losh.</li>
-<li><a href="http://address" title="title">Mislavs Vim Experience</a>: Mislavs post</li>
-<li><a href="http://blog.carbonfive.com/2011/10/17/vim-text-objects-the-definitive-guide/" title="Vim Text Objects: The Definitive Guide">Vim Text Objects: The Definitive Guide</a>:
-Great post about Vim text objects</li>
-<li><a href="http://yannesposito.com/Scratch/en/blog/Learn-Vim-Progressively/" title="Learn Vim Progressively">Learn Vim Progressively</a>:
-Nice gifs. Complete beginners introduction to Vim</li>
-<li><a href="http://www.viemu.com/a-why-vi-vim.html" title="Why, oh WHY, do those #?@! nutheads use vi?">Why, oh WHY, do those #?@! nutheads use vi?</a>:
-Lengthy blog post, explaining what modal editing in Vi and Vim is all about,
-really, really great.</li>
-</ul>
-
-
-<h2>Stack Overflow</h2>
-
-<ul>
-<li><a href="http://stackoverflow.com/questions/1218390/what-is-your-most-productive-shortcut-with-vim" title="Stack Overflow - What is your most productive shortcut with Vim?">What is your most productive shortcut with Vim?</a>:
-Great answers, first answer has over 2000 votes. Great, great.</li>
-<li><a href="http://stackoverflow.com/questions/235839/how-do-i-indent-multiple-lines-quickly-in-vi" title="How do I indent multiple lines quickly in vi?">How do I indent multiple lines quickly in vi?</a>:
-Second answer shows how flexible vim is</li>
-</ul>
-
-
-<h2>Vim Tips</h2>
-
-<ul>
-<li><a href="http://vim.wikia.com/wiki/Vim_Tips_Wiki" title="Vim Tips Wiki">Vim Tips Wiki</a>:
-Great resource for tips on Vim.</li>
-<li><a href="http://www.rayninfo.co.uk/vimtips.html" title="Best of Vim Tips">Best of Vim Tips</a>:
-Does not look pretty, but it&#8217;s well worth digging through. You may find
-interesting things.</li>
-</ul>
-
-
-<h2>Tools &amp; Tutorials</h2>
-
-<ul>
-<li><a href="http://bytefluent.com/vivify/" title="Vivify">Vivify</a>: Colorscheme tool</li>
-<li><a href="http://michael.peopleofhonoronly.com/vim/" title="Vim Cheatsheet for Programmers">Vim Cheatsheet for Programmers</a>:
-Huge cheatsheet</li>
-<li><a href="http://vimbits.com" title="Vimbits">Vimbits</a>:
-Vimbits &#8211; snippets for the vimrc</li>
-<li><a href="http://vim.runpaint.org/toc/" title="Vim Recipes">Vim Recipes</a></li>
-</ul>
-
-
-<h2>Help Yourself!</h2>
-
-<ul>
-<li><em>:help</em> is the most important command in Vim.</li>
-</ul>
-
-]]></content>
-  </entry>
   
   <entry>
     <title type="html"><![CDATA[How I used 98840 commands less and saved 4 seconds]]></title>
