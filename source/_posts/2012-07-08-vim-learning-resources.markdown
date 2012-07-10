@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Vim Learning Resources"
-date: 2012-07-08 18:52
+date: 2012-07-09 11:35
 comments: true
 published: true
 categories: 
