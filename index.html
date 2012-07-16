@@ -259,11 +259,11 @@ the wrong behaviour slowed me down.</p>
   <div class="entry-content"><p>I spent the last weekend building a caching system for <a href="http://anygood.heroku.com" title="Any Good">AnyGood</a>
 using <a href="http://www.redis.io" title="Redis">Redis</a> to save API responses for certain
 amount of time. Since the next item on my TODO list was autocompletion for my search
-form I started googling around looking for solutions involving Redis and I
-stumbled about two great posts examining this particular topic. The <a href="http://antirez.com/post/autocomplete-with-redis.html" title="Autocomplete with Redis">first one</a>
+form I started googling around looking for solutions involving Redis. I
+stumbled upon two great posts examining this particular topic: The <a href="http://antirez.com/post/autocomplete-with-redis.html" title="Autocomplete with Redis">first one</a>
 written by Salvatore Sanfilippo is a great explanation on how to use
 Redis for autocompletion and goes in great detail when explainin the algorithm.
-And the <a href="http://patshaughnessy.net/2011/11/29/two-ways-of-using-redis-to-build-a-nosql-autocomplete-search-index" title="Two ways of using Redis to build a NoSQL autocomplete search index">second one</a>
+The <a href="http://patshaughnessy.net/2011/11/29/two-ways-of-using-redis-to-build-a-nosql-autocomplete-search-index" title="Two ways of using Redis to build a NoSQL autocomplete search index">second one</a>
 by Pat Shaughnessy is a great help when explaining Sanfilippos algorithm and comparing
 it to <a href="https://github.com/seatgeek/soulmate" title="Soulmate">Soulmate</a>, &#8220;a tool to
 help solve the common problem of developing a fast autocomplete feature. It uses
@@ -274,8 +274,8 @@ them.&#8221;</p>
 <p>So I spent a good amount of time studying those articles and reading through the
 source code of Soulmate before I decided to write my own solution. Why? Because
 it was a rainy sunday afternoon, playing around with Redis is fun and I wanted
-to learn more about it. And after all, I wanted support for multiple phrases,
-search result ordering and Soulmate did all that and a bit more and just setting
+to learn more about it. Plus: I wanted multiple phrase matching and
+search result ordering. Soulmate did all that and a bit more but just setting
 it up wouldn&#8217;t have the same learning effect. And since I was out to play, I
 might as well have fun. So let&#8217;s see how to this&#8230;</p>
 
