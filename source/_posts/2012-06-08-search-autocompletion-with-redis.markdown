@@ -9,11 +9,11 @@ categories: [Redis, Ruby]
 I spent the last weekend building a caching system for [AnyGood](http://anygood.heroku.com "Any Good")
 using [Redis](http://www.redis.io "Redis") to save API responses for certain
 amount of time. Since the next item on my TODO list was autocompletion for my search
-form I started googling around looking for solutions involving Redis and I
-stumbled about two great posts examining this particular topic. The [first one](http://antirez.com/post/autocomplete-with-redis.html "Autocomplete with Redis")
+form I started googling around looking for solutions involving Redis. I
+stumbled upon two great posts examining this particular topic: The [first one](http://antirez.com/post/autocomplete-with-redis.html "Autocomplete with Redis")
 written by Salvatore Sanfilippo is a great explanation on how to use
 Redis for autocompletion and goes in great detail when explainin the algorithm.
-And the [second one](http://patshaughnessy.net/2011/11/29/two-ways-of-using-redis-to-build-a-nosql-autocomplete-search-index "Two ways of using Redis to build a NoSQL autocomplete search index")
+The [second one](http://patshaughnessy.net/2011/11/29/two-ways-of-using-redis-to-build-a-nosql-autocomplete-search-index "Two ways of using Redis to build a NoSQL autocomplete search index")
 by Pat Shaughnessy is a great help when explaining Sanfilippos algorithm and comparing
 it to [Soulmate](https://github.com/seatgeek/soulmate "Soulmate"), "a tool to
 help solve the common problem of developing a fast autocomplete feature. It uses
@@ -24,8 +24,8 @@ them."
 So I spent a good amount of time studying those articles and reading through the
 source code of Soulmate before I decided to write my own solution. Why? Because
 it was a rainy sunday afternoon, playing around with Redis is fun and I wanted
-to learn more about it. And after all, I wanted support for multiple phrases,
-search result ordering and Soulmate did all that and a bit more and just setting
+to learn more about it. Plus: I wanted multiple phrase matching and
+search result ordering. Soulmate did all that and a bit more but just setting
 it up wouldn't have the same learning effect. And since I was out to play, I
 might as well have fun. So let's see how to this...
 <!-- more -->
@@ -40,11 +40,12 @@ popularity.
 
 So when a user types into the search form, we want to to show him all the
 possible movies matching his search phrases. That means the first thing we've
-got to do is dump this data in to Redis. Like Soulmate, we use a [Redis hash](http://redis.io/topics/data-types#hashes "Redis Hashes")
-here, where each movie has its own unique key. This key can be anything as long
-as it's unique. I'm using MD5 in Anygood, since I don't save movies into a
-database and they don't have a unique ID this context. But let's suppose we do
-have an unique ID, dumping the data into Redis is pretty simple:
+got to do is dump the data we want to present into Redis. Like Soulmate, we use
+a [Redis hash](http://redis.io/topics/data-types#hashes "Redis Hashes") here,
+where each movie has its own unique key. The key can be anything as long as it's
+unique. If you don't have unique IDs for your data, you could use MD5 to
+generate some. But let's suppose we do have an unique ID, dumping the data into
+Redis is pretty simple:
 
 ```
 HSET moviesearch:data 1 "{\"name\":\"Kill Bill\",\"year\":2003}"
@@ -59,10 +60,10 @@ HSET moviesearch:data 9 "{\"name\":\"The Dark Knight\",\"year\":2008}"
 HSET moviesearch:data 10 "{\"name\":\"The Dark Knight Rises\",\"year\":2012}"
 ```
 
-`HSET` is the Redis command so save something into an hash. The key for this
+`HSET` is the Redis command to save something into a hash. The key for this
 hash is `moviesearch:data`. The single keys for every movie in this hash are the
 unique IDs: *1, 2, 3, ...*. And the data we're saving are JSON strings, which
-are a pretty convenient way of saving objects in Redis. Also, it's easy enough
+represent a pretty convenient way of saving objects to Redis. Also, it's easy enough
 in Ruby to convert a Ruby hash to JSON and after retrieving it from Redis back
 to a hash:
 
@@ -89,10 +90,10 @@ So now we've got the movies in Redis, how do we find them again?
 ## Prefixes everywhere!
 
 People are most likely trying to search for a movie by starting to type its name
-into the input field. And we want to present them the right movies before
+into the input field. And we want to show them the matching movies before
 they're even finished typing the whole name, right? That's why we're talking
 about autocompletion here. That means we need an association between word
-prefixes and the movies. If someone where to type in *The Dar* we want to
+prefixes and the movies. If someone were to type in *The Dar* we want to
 show *The Dark Knight* and *The Dark Knight Rises* as possible search terms.
 Long story short: we need to get the prefixes of every movie we just dumped in our
 `moviesearch:data` hash. For that I'm using a simple method, which is heavily based
@@ -138,7 +139,7 @@ likely to type the beginning of a word, I guess.)
 Redis uses [sorted sets](http://redis.io/topics/data-types#sorted-sets "Sorted
 Sets") as a list of unique strings that can be ranked by a score. For now, we
 will ignore the score and just use this as a set where every entry is unique and
-trying to add a new one with the same name won't result in a new entry. So let's
+trying to add one with the same name won't result in a new entry. So let's
 create a sorted set for every prefix. This set will include the key of the
 movies in which the prefix occurs and the pattern for those keys is the one
 Soulmate uses: `moviesearch:index:$PREFIX`.
@@ -173,12 +174,12 @@ using that method for all the movies we added to our data hash, we have a lot of
 sorted sets with its members being the keys for our data hash. That means, after
 adding *The Dark Knight* and *The Dark Knight Rises* the
 `moviesearch:index:dark` set has two members: `9` and `10`. So, what does that
-give us? How do we profit from this?
+give us?
 
-Let's imagine a user is visiting our website and using the search form he's typing
-*dar* into the input field.
+Let's imagine a user is visiting our website and typing *dar* into the input
+field of the search form.
 
-We now get all the entries in `moviesearch:index:ki`, which are the keys of our
+We now get all the entries in `moviesearch:index:dar`, which are the keys of our
 moviesearch:data hash. The sorted set with the key `moviesearch:index:dar`
 contains `9` and `10` as members. With those numbers we can now just fetch all
 the hash entries with these as key and present them to the user. But
@@ -217,7 +218,7 @@ quite neat! Now we have all the movies containing a word that starts with
 suggestions. Let's go one step further though:
 
 Let's suppose a user has typed *ki bi* into our search form. We now want to
-present him *Kill Bill, *Kill Bill 2*, *Kilts for Bill* as suggestions, but not
+present him *Kill Bill*, *Kill Bill 2*, *Kilts for Bill* as suggestions, but not
 *Killer Elite* and not *King Kong*. That means we need to find a movie
 containing both those prefixes in its name and not only one of them. And this is
 exactly where Redis' [ZINTERSTORE](http://redis.io/commands/zinterstore "Redis ZINTERSTORE command")
@@ -283,11 +284,11 @@ end
 ```
 
 We take every prefix occuring in the movie name and increment the score of the
-member pointing to the movies data in the `moviesearch:data` hash.
+member pointing to the movie's data in the `moviesearch:data` hash.
 
 Now, before thinking about scores of set members we used `ZRANGE` to get the
-members of a given set. Working with scores now, the next time when we try to
-match a movie with the given prefixes we use
+members of a given set. Working with scores now, the next time we try to
+match a movie with the given prefixes we'll use
 [ZREVRANGE](http://redis.io/commands/zrevrange "Redis ZREVRANGE command") to
 return the matching hash keys ordered by their respective score. The following
 should then give us *Kill Bill* at the top after we incremented the score for
@@ -318,12 +319,11 @@ end
 This method takes an array of prefixes as argument, creating the index keys for
 them, then it creates a temporary sorted set using `ZINTERSTORE` (`EXPIRE` tells Redis to delete a
 given key after the specified time in seconds) containing the data hash keys
-pointing to the movies. After that `ZREVRANGE` gets us all the members of this
+pointing to the movies. After that `ZREVRANGE` gives us all the members of this
 set ordered by their score and finally `HMGET` is used to get the data for all
 the matching keys from the `moviesearch:data` hash. There are a couple of helper
 methods involved, but it should still be pretty clear what happens. If not, look
-at the code of the whole `MovieMatcher` class I use in Anygood
-[here](https://gist.github.com/2900740 "Anygood MovieMatcher class").
+at the code of the whole `MovieMatcher` class I use in Anygood [here](https://gist.github.com/2900740 "Anygood MovieMatcher class").
 
 So everything combined we use Redis hashes to save our data, sorted sets for
 every prefix whose members point at our movies in the hash and in order to find
@@ -338,4 +338,3 @@ the other data types as we do.
 
 And if you're not [following me on Twitter](http://www.twitter.com/herrbrocken "Follow me!")
 you're missing out!
-
