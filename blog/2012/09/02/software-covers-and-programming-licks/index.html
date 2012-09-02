@@ -1,0 +1,326 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Software Cover Versions And Programming Licks - Written by Thorsten Ball</title>
+  <meta name="author" content="Thorsten Ball">
+
+  
+  <meta name="description" content="The next time you&#8217;re trying to think of something you could put into code and
+you shrug of ideas because they&#8217;ve already been implemented &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://mrnugget.github.com/blog/2012/09/02/software-covers-and-programming-licks/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Written by Thorsten Ball" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-32543112-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body    class="collapse-sidebar sidebar-footer" >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Written by Thorsten Ball</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation">  
+<ul class="main-navigation">
+  <li><a href="/">Home</a></li>
+  <li><a href="/blog/archives">Posts</a></li>
+  <li><a href="http://www.github.com/mrnugget">Github</a></li>
+  <li><a href="http://www.twitter.com/herrbrocken">Twitter</a></li>
+</ul>
+<ul class="subscription">
+  <li><a href="/atom.xml" alt="Subscribe to the RSS feed">RSS</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Software Cover Versions and Programming Licks</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-09-02T22:43:00+02:00" pubdate data-updated="true">Sep 2<span>nd</span>, 2012</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>The next time you&#8217;re trying to think of something you could put into code and
+you shrug of ideas because they&#8217;ve already been implemented, try this: Write a
+<a href="http://en.wikipedia.org/wiki/Cover_(music">cover version</a>) of a piece of
+software.</p>
+
+<p>Try to imitate software. A project you like, a project you use, a project that
+implemented the idea you just shrugged of. Imagine yourself in a software cover
+band and try your best to replicate it.</p>
+
+<p>Why? It&#8217;s surely a waste of time, I hear you say. And if we&#8217;re talking about
+paid software development I fully agree. But consider yourself having a couple
+of hours to spare and you&#8217;re eager to write some code: covering a piece
+of software proves to be a great way to gain knowledge and become a better
+programmer.</p>
+
+<!-- more -->
+
+
+<p>I&#8217;ve been playing guitar for nearly eight years now and spent a great deal of
+that time learning and playing other peoples songs. Creatively speaking this is
+not as fulfilling as writing your own material and coming up with new, fresh
+ideas is certainly better than playing <em>The Thrill Is Gone</em> at a bar gig. But by
+doing covers you learn new chord sequences, new
+<a href="http://en.wikipedia.org/wiki/Lick_(music">licks</a> &#8216;Licks (Wikipedia)), new
+tricks and probably discover something new you haven&#8217;t thought of yet. And once
+you&#8217;ve got a song down and can play it note-perfect, when your muscles remember
+how to play a difficult part without struggling, then comes the best part: you
+can have fun and play around with it. You can improvise over it, you can change
+it, you can disassemble and reassemble it and (this is most important bit) you
+can use those little tricks and ideas and incorporate them in your own material.</p>
+
+<p>I&#8217;m not talking about copying here, I&#8217;m talking about learning solutions to
+problems and applying them when the need arises. Learning to play a Led Zeppelin
+song on guitar might sound dull since every guitar player on the planet knows
+how to play at least one of them. There is nothing left to prove. But there is
+still something left to be learned: when you&#8217;ve got the solo of <em>Since I&#8217;ve Been
+Loving You</em> down to the note, the next time your solo spot comes up and you
+want have a intense dynamic build-up, try to think of Jimmy Page and how he&#8217;d
+do it, which tricks he&#8217;d use.</p>
+
+<p>You do this with software and programming too. I&#8217;ve been playing around with
+<a href="https://github.com/etsy/statsd" title="statsd">statsd</a> a couple of weeks ago and I
+thought about implementing a stats collector in Ruby until I found out that it&#8217;s
+already <a href="https://github.com/noahhl/batsd">been done</a>. So I was about to shrug it
+of and do something else when I decided to do it anyway. Just for fun. Just to
+find out how to do it.</p>
+
+<p>I wouldn&#8217;t have learned as much as I did in the last week about buffering,
+concurrency, streaming and UNIX sockets if I hadn&#8217;t tried it. And the best part?
+Whenever I got stuck, I read through the <em>statsd</em> or the <em>batsd</em> code to see how
+they solve a certain problem and I learned something new. Surely you learn
+something new too when trying to implement a piece of software that hasn&#8217;t been
+written before. But this is different: you already have solutions to problems to
+look at and learn from. And when facing the same problem you can learn about the
+problem and the solutions at the same time. This is a great way of learning software
+development, since you can&#8217;t fully understand and judge a solution if you don&#8217;t
+fully understand the problem you&#8217;re facing.</p>
+
+<p>And once you know and understand different solutions to different problems you
+can then apply them in other situations. By trying to write software covers you
+get to know the problem and how a particular piece of software solved it. Or, as
+in my case with <em>statsd</em> and <em>batsd</em>, you start to understand different
+solutions to one problem. Doing this, you can learn a whole lot of new
+programming tricks and licks and use them whenever they fit.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Thorsten Ball</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-09-02T22:43:00+02:00" pubdate data-updated="true">Sep 2<span>nd</span>, 2012</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://mrnugget.github.com/blog/2012/09/02/software-covers-and-programming-licks/" data-via="thorstenball" data-counturl="http://mrnugget.github.com/blog/2012/09/02/software-covers-and-programming-licks/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/07/09/vim-learning-resources/" title="Previous Post: Vim Learning Resources">&laquo; Vim Learning Resources</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section class="about">
+  <h1>About Me</h1>
+  <img src="/images/avatar.jpg">
+  <p>
+    I'm 24 years old, living in Berlin, Germany and I want to write about things
+    that I'm interested in: Programming, Web Development, Ruby, Ruby on Rails,
+    Web Development, Music and Guitars!
+  </p>
+  <p>
+    I do web development in Berlin.
+  </p>
+  <p>
+    If you want to contact me via e-mail: <a href="http://www.github.com/mrnugget">my github username</a> at gmail.com
+  </p>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/09/02/software-covers-and-programming-licks/">Software Cover Versions And Programming Licks</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/07/09/vim-learning-resources/">Vim Learning Resources</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/20/how-i-used-98840-commands-less-and-saved-4-seconds/">How I used 98840 commands less and saved 4 seconds</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/08/search-autocompletion-with-redis/">Ordered Search Autocompletion With Redis</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("thorstenball", 4, false);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/thorstenball" class="twitter-follow-button" data-show-count="false">Follow @thorstenball</a>
+  
+</section>
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2012 - Thorsten Ball
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'writtenbythorstenball';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://mrnugget.github.com/blog/2012/09/02/software-covers-and-programming-licks/';
+        var disqus_url = 'http://mrnugget.github.com/blog/2012/09/02/software-covers-and-programming-licks/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

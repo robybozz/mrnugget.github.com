@@ -4,7 +4,7 @@
   <title><![CDATA[Written by Thorsten Ball]]></title>
   <link href="http://mrnugget.github.com/atom.xml" rel="self"/>
   <link href="http://mrnugget.github.com/"/>
-  <updated>2012-08-08T08:55:52+02:00</updated>
+  <updated>2012-09-02T22:48:53+02:00</updated>
   <id>http://mrnugget.github.com/</id>
   <author>
     <name><![CDATA[Thorsten Ball]]></name>
@@ -12,6 +12,78 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Software Cover Versions And Programming Licks]]></title>
+    <link href="http://mrnugget.github.com/blog/2012/09/02/software-covers-and-programming-licks/"/>
+    <updated>2012-09-02T22:43:00+02:00</updated>
+    <id>http://mrnugget.github.com/blog/2012/09/02/software-covers-and-programming-licks</id>
+    <content type="html"><![CDATA[<p>The next time you&#8217;re trying to think of something you could put into code and
+you shrug of ideas because they&#8217;ve already been implemented, try this: Write a
+<a href="http://en.wikipedia.org/wiki/Cover_(music">cover version</a>) of a piece of
+software.</p>
+
+<p>Try to imitate software. A project you like, a project you use, a project that
+implemented the idea you just shrugged of. Imagine yourself in a software cover
+band and try your best to replicate it.</p>
+
+<p>Why? It&#8217;s surely a waste of time, I hear you say. And if we&#8217;re talking about
+paid software development I fully agree. But consider yourself having a couple
+of hours to spare and you&#8217;re eager to write some code: covering a piece
+of software proves to be a great way to gain knowledge and become a better
+programmer.</p>
+
+<!-- more -->
+
+
+<p>I&#8217;ve been playing guitar for nearly eight years now and spent a great deal of
+that time learning and playing other peoples songs. Creatively speaking this is
+not as fulfilling as writing your own material and coming up with new, fresh
+ideas is certainly better than playing <em>The Thrill Is Gone</em> at a bar gig. But by
+doing covers you learn new chord sequences, new
+<a href="http://en.wikipedia.org/wiki/Lick_(music">licks</a> &#8216;Licks (Wikipedia)), new
+tricks and probably discover something new you haven&#8217;t thought of yet. And once
+you&#8217;ve got a song down and can play it note-perfect, when your muscles remember
+how to play a difficult part without struggling, then comes the best part: you
+can have fun and play around with it. You can improvise over it, you can change
+it, you can disassemble and reassemble it and (this is most important bit) you
+can use those little tricks and ideas and incorporate them in your own material.</p>
+
+<p>I&#8217;m not talking about copying here, I&#8217;m talking about learning solutions to
+problems and applying them when the need arises. Learning to play a Led Zeppelin
+song on guitar might sound dull since every guitar player on the planet knows
+how to play at least one of them. There is nothing left to prove. But there is
+still something left to be learned: when you&#8217;ve got the solo of <em>Since I&#8217;ve Been
+Loving You</em> down to the note, the next time your solo spot comes up and you
+want have a intense dynamic build-up, try to think of Jimmy Page and how he&#8217;d
+do it, which tricks he&#8217;d use.</p>
+
+<p>You do this with software and programming too. I&#8217;ve been playing around with
+<a href="https://github.com/etsy/statsd" title="statsd">statsd</a> a couple of weeks ago and I
+thought about implementing a stats collector in Ruby until I found out that it&#8217;s
+already <a href="https://github.com/noahhl/batsd">been done</a>. So I was about to shrug it
+of and do something else when I decided to do it anyway. Just for fun. Just to
+find out how to do it.</p>
+
+<p>I wouldn&#8217;t have learned as much as I did in the last week about buffering,
+concurrency, streaming and UNIX sockets if I hadn&#8217;t tried it. And the best part?
+Whenever I got stuck, I read through the <em>statsd</em> or the <em>batsd</em> code to see how
+they solve a certain problem and I learned something new. Surely you learn
+something new too when trying to implement a piece of software that hasn&#8217;t been
+written before. But this is different: you already have solutions to problems to
+look at and learn from. And when facing the same problem you can learn about the
+problem and the solutions at the same time. This is a great way of learning software
+development, since you can&#8217;t fully understand and judge a solution if you don&#8217;t
+fully understand the problem you&#8217;re facing.</p>
+
+<p>And once you know and understand different solutions to different problems you
+can then apply them in other situations. By trying to write software covers you
+get to know the problem and how a particular piece of software solved it. Or, as
+in my case with <em>statsd</em> and <em>batsd</em>, you start to understand different
+solutions to one problem. Doing this, you can learn a whole lot of new
+programming tricks and licks and use them whenever they fit.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Vim Learning Resources]]></title>
