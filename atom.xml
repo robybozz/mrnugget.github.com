@@ -4,7 +4,7 @@
   <title><![CDATA[Written by Thorsten Ball]]></title>
   <link href="http://mrnugget.github.com/atom.xml" rel="self"/>
   <link href="http://mrnugget.github.com/"/>
-  <updated>2012-10-08T09:45:45+02:00</updated>
+  <updated>2012-10-24T10:04:03+02:00</updated>
   <id>http://mrnugget.github.com/</id>
   <author>
     <name><![CDATA[Thorsten Ball]]></name>
@@ -12,6 +12,238 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Command Line Ride]]></title>
+    <link href="http://mrnugget.github.com/blog/2012/10/24/command-line-ride/"/>
+    <updated>2012-10-24T09:38:00+02:00</updated>
+    <id>http://mrnugget.github.com/blog/2012/10/24/command-line-ride</id>
+    <content type="html"><![CDATA[<p>When your harddrive is running out of space, chances are good that there are
+files you can safely delete in order to free up some of that space.
+A safe bet are archive files, like ZIP and RAR-files, you&#8217;ve already
+decompressed.</p>
+
+<p>I went on a little ride to put together a command that shows me how much space a
+certain type of file take up. There first thing I did was <code>find</code>ing those
+files&#8230;</p>
+
+<!-- more -->
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>find / -type f -name <span class="s1">&#39;*.rar&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>What does <code>find</code> do here? It looks up all the files on the harddrive that are
+really files (<code>-type f</code>) and not directories and whose names end in <code>.rar</code>. That
+got me pretty far. But still not far enough: sometimes RAR-archives are splitted
+up into several files called <code>archive.rar archive.r01 archive.r02</code> and so on.
+They should be listed as well:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>find / -type f -regex <span class="s1">&#39;.*r[0-9][0-9]&#39;</span> -o -name <span class="s2">&quot;*.rar&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>That&#8217;s better! Here <code>find</code> lists the filenames matching the provided regex or
+(<code>-o</code>) those ending in <code>.rar</code>. Running this command in a directory containing
+such an array of RAR-files outputs the following:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>find . -type f -regex <span class="s1">&#39;.*r[0-9][0-9]&#39;</span> -o -name <span class="s2">&quot;*.rar&quot;</span>
+</span><span class='line'>./big_archive.r01
+</span><span class='line'>./big_archive.r02
+</span><span class='line'>./big_archive.r03
+</span><span class='line'>./big_archive.r04
+</span><span class='line'>./big_archive.r05
+</span><span class='line'>./big_archive.rar
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>But I still didn&#8217;t know how big those files are. So the first thought was: use
+<code>ls -l</code> on every file since that gives me the size of every file. But <code>ls</code> takes
+filenames as command line arguments and doesn&#8217;t read from the standard input
+stream. So I couldn&#8217;t just pipe the list to <code>ls</code>, since a Unix pipe connects the
+standard output stream of one program to the standard input of another program.
+Just try it:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>find . -name <span class="s1">&#39;*.txt&#39;</span> | ls -l
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>That shouldn&#8217;t give you the desired output. What happens here is that <code>ls</code>
+doesn&#8217;t get an argument and lists the contents of the current directory. So how
+does one call <code>ls -l</code> on every file in the list above? Pipe the list of files to
+<code>xargs</code>. <code>xargs</code>&#8217;s job is to construct argument lists for the provided command.
+It does so by splitting up the data it receives on the standard input and using
+each chunk as an argument. By default <code>xargs</code> splits the incoming data by
+newlines or blanks, which is normally fine but could lead to problems when
+<code>find</code> outputs a filename containing whitespaces. In that case, be sure to use
+<code>man find</code> and <code>man xargs</code>: You can specify a delimiter other than blank or
+newline. So far the output should look like this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>find . -type f -regex <span class="s1">&#39;.*r[0-9][0-9]&#39;</span> -o -name <span class="s2">&quot;*.rar&quot;</span> | xargs ls -l
+</span><span class='line'>-rw-r--r--  1 mrnugget  staff  1024000 Oct 18 13:58 ./big_archive.r01
+</span><span class='line'>-rw-r--r--  1 mrnugget  staff  1024000 Oct 18 13:58 ./big_archive.r02
+</span><span class='line'>-rw-r--r--  1 mrnugget  staff  1024000 Oct 18 13:58 ./big_archive.r03
+</span><span class='line'>-rw-r--r--  1 mrnugget  staff  1024000 Oct 18 13:58 ./big_archive.r04
+</span><span class='line'>-rw-r--r--  1 mrnugget  staff  1024000 Oct 18 13:58 ./big_archive.r05
+</span><span class='line'>-rw-r--r--  1 mrnugget  staff  1024000 Oct 18 13:57 ./big_archive.rar
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Great, I thought, now I just need to get all the different filesizes, add them together
+and print the total sum! Shouldn&#8217;t be too hard, right? Well, it isn&#8217;t if you got
+<code>awk</code>. <code>awk</code> has too numerous capabilities to explain in this blog post. So
+let me make it short: <code>awk</code> read its input from either the STDIN or from files
+passed in as arguments and then performs actions on matching lines. To make it
+even shorter: <code>awk</code> is awesome. There is a lot of free information available on
+the internet about <code>awk</code>, but a single <code>man awk</code> goes a long way.</p>
+
+<p>Using <code>awk</code> to output the sum of the filesizes looks like this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>find . -type f -regex <span class="s1">&#39;.*r[0-9][0-9]&#39;</span> -o -name <span class="s2">&quot;*.rar&quot;</span> | xargs ls -l | awk <span class="s1">&#39;{sum = sum + $5} END {print sum}&#39;</span>
+</span><span class='line'>6144000
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Here <code>awk</code> takes the fifth field (the fields are by default separated by blanks)
+and increments the variable <code>sum</code> by it. At the end of the <code>awk</code>-program (after
+<code>awk</code> ran it over each line) it prints out the sum, which gives us the sum of
+the filesizes. But that&#8217;s not really readable since the output of <code>ls -l</code>
+contains filesizes in bytes and I think it&#8217;s safe to say that megabytes would be
+far more handy in this case. So I had to divide the sum by 1024 to get
+kilobytes and then again by 1024 to get megabytes and I did this with the help
+of <code>xargs</code> and <code>bc</code>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>find . -type f -regex <span class="s1">&#39;.*r[0-9][0-9]&#39;</span> -o -name <span class="s2">&quot;*.rar&quot;</span> | xargs ls -l | awk <span class="s1">&#39;{sum = sum + $5} END {print sum}&#39;</span> | xargs -I sum <span class="nb">echo </span>sum/1024/1024 | bc -l
+</span><span class='line'>5.85937500000000000000
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>That looks great! So what happens here? <code>xargs</code> uses a name for the data it
+reads from standard input, <code>sum</code>, and then the <code>echo</code> command to output the
+calculation that needs to be fed to <code>bc</code>. Without the <code>bc</code> the command above
+would just output <code>6144000/1024/1024</code>. <code>bc</code> then takes this as input and gives
+us the result. Be sure to do this: <code>man bc</code>. This example here doesn&#8217;t even
+scratch the surface of what <code>bc</code> is capable of.</p>
+
+<p>So now the job is done, right? The command line above now outputs the total size
+of all the RAR-files on the harddrive or in the current directory. Well,
+technically yes, it&#8217;s done. But as you can see, that was pretty heavy lifting,
+nobody will remember that command above and when first looking at it nobody will
+know what it exactly does.</p>
+
+<p>And here&#8217;s the kicker: it&#8217;s useless. That command above is obsolete. As soon as
+I finished hacking up that command line I remembered a tool that I basically use
+every day but totally forgot about while hacking together the right <code>find</code>-regex,
+looking up <code>awk</code> formulas and how <code>bc</code> works. There is one tool that does
+exactly what that long line above does and it&#8217;s called <code>du</code>. <code>du</code> is built for
+the job. It&#8217;s a simple tool that does one thing very well (and I quote the man
+page here) and that is to &#8220;display disk usage statistics&#8221;. I can&#8217;t for the life
+of me explain how I forgot it. With <code>du</code> in hand, the line shrinks down to this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>find / -type f -regex <span class="s1">&#39;.*r[0-9][0-9]&#39;</span> -o -name <span class="s2">&quot;*.rar&quot;</span> | xargs du -ch
+</span><span class='line'>1000K ./example_dir/big_archive.r01
+</span><span class='line'>1000K ./example_dir/big_archive.r02
+</span><span class='line'>1000K ./example_dir/big_archive.r03
+</span><span class='line'>1000K ./example_dir/big_archive.r04
+</span><span class='line'>1000K ./example_dir/big_archive.r05
+</span><span class='line'>1000K ./example_dir/big_archive.rar
+</span><span class='line'>5.9M  total
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>That looks a lot better than that monster I hacked together. And it&#8217;s easier to
+understand too: 1) find all the files matching a certain pattern 2) then pass
+them to <code>du</code> to display how much space they take up. After remembering <code>du</code> I
+thought: &#8220;Well, maybe I can shrink this down even further&#8221;. And I did.</p>
+
+<p>When you use <code>find</code> and the <code>-regex</code> option you&#8217;re in for a challenge. <code>find</code>
+allows you to use <a href="http://www.gnu.org/software/findutils/manual/html_mono/find.html#Regular-Expressions" title="Find &amp; Regex">many different types of Regular Expressions</a>
+and the differences sometimes make it really difficult and frustrating to get
+the regex you want to work. Just have a look <a href="http://www.greenend.org.uk/rjk/tech/regexp.html">here</a>.</p>
+
+<p>Most of the time it&#8217;s probably easier to use the globbing functionality of
+your shell rather than using <code>find</code> and regex. Especially ZSH is <a href="http://grml.org/zsh/zsh-lovers.html">pretty good with globbing</a>
+ and bash also does its job very well. Since I&#8217;m using ZSH I tried to get rid of <code>find</code> and use my shell&#8217;s
+built-in globbing functionality.  And what I came up with is so much better than
+that long line above:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>ls **/*.r<span class="o">(</span>ar|&lt;-99&gt;<span class="o">)</span> | xargs du -ch
+</span><span class='line'>1000K example_dir/big_archive.r01
+</span><span class='line'>1000K example_dir/big_archive.r02
+</span><span class='line'>1000K example_dir/big_archive.r03
+</span><span class='line'>1000K example_dir/big_archive.r04
+</span><span class='line'>1000K example_dir/big_archive.r05
+</span><span class='line'>1000K example_dir/big_archive.rar
+</span><span class='line'>5.9M  total
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>That line recursively lists all files ending in either <code>rar</code> or <code>r01</code> up to
+<code>r99</code> and then passes them over to <code>du</code>. Easy to read, easy to understand
+and more importantly: easy to reuse.</p>
+
+<p>There is a lot I learned on this ride and most importantly it was seeing the
+<a href="http://www.catb.org/~esr/writings/taoup/html/ch01s06.html">Unix philosophy</a> in action:</p>
+
+<blockquote><p>&#8220;This is the Unix philosophy: Write programs that do one thing and do it well.
+Write programs to work together. Write programs to handle text streams,
+because that is a universal interface.&#8221; - Doug McIlroy</p></blockquote>
+
+<p>All of those programs work very well together, they are combinable, they are
+reusable and they do one thing well. And in this case <code>du</code> was that program that
+did the one thing I wanted to achieve very well and could be used to replace
+another complex &#8220;program&#8221;, if you want to call that line above a program.</p>
+
+<p>That is not to say that complex command lines are always wrong to use, no. Sometimes
+you need that many programs to work together in order to get the desired output.
+And when that happens it&#8217;s great to see how good every tool is at doing its own
+job and which problems can be solved by combining them. And Unix pipes make it
+dead easy to combine them by offering a clean and easy to understand inteface.</p>
+
+<p>Seeing that philosophy in action shows extremely well how much code and programs
+can profit from complying with it.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Software Cover Versions And Programming Licks]]></title>
