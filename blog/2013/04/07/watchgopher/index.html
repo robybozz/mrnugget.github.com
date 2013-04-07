@@ -1,0 +1,415 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Watchgopher - Written by Thorsten Ball</title>
+  <meta name="author" content="Thorsten Ball">
+
+  
+  <meta name="description" content="In the last couple of months I&#8217;ve been playing a lot with
+Go and did what I always do when learning a new
+language: use it for a small project &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://mrnugget.github.com/blog/2013/04/07/watchgopher/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Written by Thorsten Ball" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-32543112-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body    class="collapse-sidebar sidebar-footer" >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Written by Thorsten Ball</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation">  
+<ul class="main-navigation">
+  <li><a href="/">Home</a></li>
+  <li><a href="/blog/archives">Posts</a></li>
+  <li><a href="http://www.github.com/mrnugget">Github</a></li>
+  <li><a href="http://www.twitter.com/thorstenball">Twitter</a></li>
+</ul>
+<ul class="subscription">
+  <li><a href="/atom.xml" alt="Subscribe to the RSS feed">RSS</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Watchgopher</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-04-07T14:24:00+02:00" pubdate data-updated="true">Apr 7<span>th</span>, 2013</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>In the last couple of months I&#8217;ve been playing a lot with
+<a href="http://www.golang.org">Go</a> and did what I always do when learning a new
+language: use it for a small project. That project has been open to the public
+on GitHub for a few weeks now and is now in a usable state:
+<a href="http://www.github.com/mrnugget/watchgopher">Watchgopher</a>.</p>
+
+<p>Watchgopher allows you to watch certain directories and run custom commands
+whenever a file in a specified directory changes. It is supposed to be
+simple and give you control of what happens to your files: it only notifies
+one of your commands whenever something happens it should know about.</p>
+
+<p>Let me guide you through a simple example to show you what Watchgopher can do.
+But first, make sure you have <a href="http://www.golang.org">Go</a> installed and then run
+the following command to install Watchgopher on your system:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>go get -u github.com/mrnugget/watchgopher
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now the <code>watchgopher</code> command should be available on your system and it&#8217;s time
+to tell Watchgopher which directories to watch and what to do about any file
+events occurring in them. So let&#8217;s create a simple configuration file in JSON
+format:</p>
+
+<!-- more -->
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="nt">&quot;/Users/mrnugget/Downloads&quot;</span><span class="p">:</span> <span class="p">[</span>
+</span><span class='line'>    <span class="p">{</span><span class="nt">&quot;pattern&quot;</span><span class="p">:</span> <span class="s2">&quot;*.zip&quot;</span><span class="p">,</span> <span class="nt">&quot;run&quot;</span><span class="p">:</span> <span class="s2">&quot;/Users/mrnugget/.watchgophers/unzip.rb&quot;</span><span class="p">}</span>
+</span><span class='line'>  <span class="p">]</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This file tells Watchgopher to watch the <code>Downloads</code> directory in my home
+directory and whenever something happens to a file whose name matches <code>*.zip</code>,
+Watchgopher will run the specified command. If the command is in your <code>$PATH</code>
+you won&#8217;t need to put the absolute</p>
+
+<p>When running the command it will pass two arguments to it:</p>
+
+<ol>
+<li>The type of the file event. This can be <code>CREATE</code>, <code>MODIFY</code>, <code>DELETE</code>,
+or <code>RENAME</code>.</li>
+<li>The absolute path to the file triggering the event.</li>
+</ol>
+
+
+<p>After saving the config file we need to create the command which will be run. As
+you may have guessed by reading the file names, I want to create a small command
+that unzips every newly created zip file in my <code>Downloads</code> directory. The code
+to do this is pretty simple:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1">#!/usr/bin/env ruby</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="k">if</span> <span class="no">ARGV</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span> <span class="o">!=</span> <span class="s2">&quot;CREATE&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">success</span> <span class="o">=</span> <span class="nb">system</span><span class="p">(</span><span class="s2">&quot;unzip </span><span class="si">#{</span><span class="no">ARGV</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="si">}</span><span class="s2"> -d </span><span class="si">#{</span><span class="no">File</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="no">ARGV</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span class='line'><span class="n">success</span> <span class="p">?</span> <span class="nb">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="p">:</span> <span class="nb">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This script does three things:</p>
+
+<ol>
+<li>Exit with exit code 0 if the file event is not <code>CREATE</code>, since I&#8217;m not
+interested in <code>DELETE</code> events here, because unzipping deleted files is a
+pretty difficult thing to do.</li>
+<li>Run the <code>unzip</code> command with the filename as first argument and the directory
+the file is in as <code>-d</code> option, which means it will unzip to the same
+directory the zip file was created in, no matter from where you run Watchgopher.</li>
+<li>It checks whether the <code>unzip</code> command exited successfully. If it did, it
+exits successfully too and if it didn&#8217;t, it exits with error code 1. (You can
+achieve the same thing with Ruby&#8217;s <code>Kernel#exec</code>, but explaining what exec
+does is not part of this post)</li>
+</ol>
+
+
+<p>Let&#8217;s the save the file at the specified place
+(<code>/Users/mrnugget/.watchgophers/unzip.rb</code>) and give it the right permissions:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>chmod +x ~/.watchgophers/unzip.rb
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now is the time to launch Watchgopher and point it towards the configuration
+file:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>watchgopher watchgopher_config.json
+</span><span class='line'>2013/04/06 13:50:25 Successfully loaded configuration file. Number of rules: 1
+</span><span class='line'>2013/04/06 13:50:25 Watchgopher is now ready process file events
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Watchgopher now watches the <code>Downloads</code> folder for zip files. We should give him
+one:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>mv Octocats.zip ~/Downloads/
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This should prompt Watchgopher to output the following:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>2013/04/06 13:53:23 /Users/mrnugget/.watchgophers/unzip_files.rb, ARGS: <span class="o">[</span>CREATE /Users/mrnugget/tmp/zips/Octocats.zip<span class="o">]</span> -- SUCCESS
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And if we take a look inside the <code>Downloads</code> directory we will find a newly
+extracted <code>Octocat</code> directory, which means everything went as planned! Great!</p>
+
+<p>As you can see, this concept of handing over the handling of certain file events
+over to specified commands gives you a lot of freedom when dealing with file
+changes on your system. Since Watchgopher passes the two arguments to every
+specified command, the command can decide what to do about it: delete newly
+created files, move them to another directory, upload them to a server, or
+ignore the file events altogether and just have a look around a directory for
+old files and delete them whenever something happens in there. To make it
+short: It&#8217;s up to you how you will react to file changes, Watchgopher just tells
+you about them.</p>
+
+<p>There are still a lot more features that I want to implement that are currently
+missing: including the output of the specified commands in Watchgopher&#8217;s log
+output, allow to specify the current working directory of a command, allow path
+expansion and many more features and tweaks.</p>
+
+<p>I&#8217;d be happy if you give Watchgopher a try and I&#8217;m also thankful for every
+comment, question, issue opened and pull request sent, so don&#8217;t hesitate!</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Thorsten Ball</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-04-07T14:24:00+02:00" pubdate data-updated="true">Apr 7<span>th</span>, 2013</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://mrnugget.github.com/blog/2013/04/07/watchgopher/" data-via="thorstenball" data-counturl="http://mrnugget.github.com/blog/2013/04/07/watchgopher/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2013/01/15/discipline/" title="Previous Post: Discipline">&laquo; Discipline</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section class="about">
+  <h1>About Me</h1>
+  <img src="/images/avatar.jpg">
+  <p>
+    I'm 24 years old, living in Berlin, Germany and I want to write about things
+    that I'm interested in: Programming, Web Development, Ruby, Ruby on Rails,
+    Web Development, Music and Guitars!
+  </p>
+  <p>
+    I do web development in Berlin.
+  </p>
+  <p>
+    If you want to contact me via e-mail: <a href="http://www.github.com/mrnugget">my github username</a> at gmail.com
+  </p>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/04/07/watchgopher/">Watchgopher</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/01/15/discipline/">Discipline</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/10/24/command-line-ride/">Command Line Ride</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/09/02/software-covers-and-programming-licks/">Software Cover Versions And Programming Licks</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/07/09/vim-learning-resources/">Vim Learning Resources</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("thorstenball", 4, false);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/thorstenball" class="twitter-follow-button" data-show-count="false">Follow @thorstenball</a>
+  
+</section>
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - Thorsten Ball
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'writtenbythorstenball';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://mrnugget.github.com/blog/2013/04/07/watchgopher/';
+        var disqus_url = 'http://mrnugget.github.com/blog/2013/04/07/watchgopher/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
